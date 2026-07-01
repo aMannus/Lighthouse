@@ -30,6 +30,21 @@ void LighthouseMenu::AddMenuNetwork() {
     return;
 #endif
     AddSidebarEntry("Network", "Anchor", 2);
+
+    // Archipelago
+    path = { "Network", "Archipelago", SECTION_COLUMN_1 };
+    AddSidebarEntry(path.sectionName, path.sidebarName, 2);
+    AddWidget(path, "Popout Archipelago Settings Window", WIDGET_WINDOW_BUTTON)
+        .CVar(CVAR_WINDOW("ArchipelagoSettings"))
+        .RaceDisable(false)
+        .WindowName("Archipelago Settings");
+
+    path.column = SECTION_COLUMN_2;
+
+    AddWidget(path, "Popout Archipelago Console Window", WIDGET_WINDOW_BUTTON)
+        .CVar(CVAR_WINDOW("ArchipelagoConsole"))
+        .RaceDisable(false)
+        .WindowName("Archipelago Console");
 }
 
 } // namespace LighthouseGui
