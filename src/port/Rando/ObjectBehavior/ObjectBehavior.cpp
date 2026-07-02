@@ -383,8 +383,8 @@ void Rando::ObjectBehavior::Init() {
                 case MARKER_5E_JINJO_YELLOW:
                     if (RANDO_SAVE_OPTIONS[RO_SHUFFLE_JINJOS].optionValue == RO_GENERIC_ON) {
                         randoItemId = randoSaveCheck.randoItemId;
-                        //randoItemId = Rando::StaticData::GetRandoItemByActorId(
-                        //    jinjoMarkerMap.at(ev->propId->actorProp.marker->id));
+                        // randoItemId = Rando::StaticData::GetRandoItemByActorId(
+                        //     jinjoMarkerMap.at(ev->propId->actorProp.marker->id));
                     }
                     break;
                 case MARKER_5F_MUSIC_NOTE:

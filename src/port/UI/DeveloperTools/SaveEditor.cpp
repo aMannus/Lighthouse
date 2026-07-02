@@ -446,11 +446,11 @@ void DrawRandoCheckEditor() {
                     ImGui::TableNextColumn();
 
                     TableCellCenteredText(Rando::StaticData::Items[check.randoItemId].name);
-                    //if (check.randoItemId == RI_MOLEHILL) {
-                    //    TableCellCenteredText(abilityNameList[check.randoCollectionId].c_str());
-                    //} else {
-                    //    TableCellCenteredText(Rando::StaticData::Items[check.randoItemId].name);
-                    //}
+                    // if (check.randoItemId == RI_MOLEHILL) {
+                    //     TableCellCenteredText(abilityNameList[check.randoCollectionId].c_str());
+                    // } else {
+                    //     TableCellCenteredText(Rando::StaticData::Items[check.randoItemId].name);
+                    // }
                     ImGui::TableNextColumn();
 
                     if (Rando::StaticData::Checks[check.shuffledCheckId].randoCheckType != RCTYPE_JINJO &&

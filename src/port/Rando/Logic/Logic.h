@@ -147,7 +147,7 @@ inline int32_t GetTotalSnsItemsCollected() {
         if (!pool.obtained) {
             continue;
         }
-        
+
         if (pool.randoItemId >= RI_STOP_N_SWOP_EGG_BLUE && pool.randoItemId <= RI_STOP_N_SWOP_ICE_KEY) {
             snsCount++;
         }
