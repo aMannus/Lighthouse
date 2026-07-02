@@ -231,8 +231,6 @@ bool CheckEnemyOverlapPosition(int32_t pos[3]) {
     return enemyOverlap;
 }
 
-// CALL_EVENT expands to a braced initializer whose commas don't survive being passed through the
-// COND_HOOK macro wrapper, so fire it from a plain function the listener calls instead.
 static void FireClearBundleDespawnQueue() {
     CALL_EVENT(ClearBundleDespawnQueue);
 }
@@ -383,8 +381,6 @@ void Rando::ObjectBehavior::Init() {
                 case MARKER_5E_JINJO_YELLOW:
                     if (RANDO_SAVE_OPTIONS[RO_SHUFFLE_JINJOS].optionValue == RO_GENERIC_ON) {
                         randoItemId = randoSaveCheck.randoItemId;
-                        // randoItemId = Rando::StaticData::GetRandoItemByActorId(
-                        //     jinjoMarkerMap.at(ev->propId->actorProp.marker->id));
                     }
                     break;
                 case MARKER_5F_MUSIC_NOTE:
