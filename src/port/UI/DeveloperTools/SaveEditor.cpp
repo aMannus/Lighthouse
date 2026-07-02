@@ -108,22 +108,23 @@ void SaveEditor_UpdateCheckTracker(RandoSaveCheck randoSaveCheck) {
 
     int32_t itemIncr = randoSaveCheck.obtained ? 1 : -1;
 
-    switch (randoSaveCheck.randoItemId) {
-        case RI_JIGGY:
+    actor_e actorId = Rando::StaticData::GetActorIdByRandoItemId(randoSaveCheck.randoItemId);
+    switch (actorId) {
+        case ACTOR_46_JIGGY:
             jiggyscore_setCollected(randoSaveCheck.randoCollectionId, randoSaveCheck.obtained);
             item_adjustByDiffWithoutHud(ITEM_26_JIGGY_TOTAL, itemIncr);
             break;
-        case RI_EMPTY_HONEYCOMB:
+        case ACTOR_47_EMPTY_HONEYCOMB:
             honeycombscore_set((honeycomb_e)randoSaveCheck.randoCollectionId, randoSaveCheck.obtained);
             break;
-        case RI_MOLEHILL:
+        case ACTOR_12C_MOLEHILL:
             if (randoSaveCheck.obtained) {
                 ability_unlock((ability_e)randoSaveCheck.randoCollectionId);
             } else {
                 ability_setLearned((ability_e)randoSaveCheck.randoCollectionId, 0);
             }
             break;
-        case RI_MUMBO_TOKEN:
+        case ACTOR_2D_MUMBO_TOKEN:
             mumboscore_set((mumbotoken_e)randoSaveCheck.randoCollectionId, randoSaveCheck.obtained);
             item_adjustByDiffWithoutHud(ITEM_1C_MUMBO_TOKEN, itemIncr);
             break;
@@ -444,11 +445,12 @@ void DrawRandoCheckEditor() {
                     ImGui::TextWrapped(checkName.c_str());
                     ImGui::TableNextColumn();
 
-                    if (check.randoItemId == RI_MOLEHILL) {
-                        TableCellCenteredText(abilityNameList[check.randoCollectionId].c_str());
-                    } else {
-                        TableCellCenteredText(Rando::StaticData::Items[check.randoItemId].name);
-                    }
+                    TableCellCenteredText(Rando::StaticData::Items[check.randoItemId].name);
+                    //if (check.randoItemId == RI_MOLEHILL) {
+                    //    TableCellCenteredText(abilityNameList[check.randoCollectionId].c_str());
+                    //} else {
+                    //    TableCellCenteredText(Rando::StaticData::Items[check.randoItemId].name);
+                    //}
                     ImGui::TableNextColumn();
 
                     if (Rando::StaticData::Checks[check.shuffledCheckId].randoCheckType != RCTYPE_JINJO &&
