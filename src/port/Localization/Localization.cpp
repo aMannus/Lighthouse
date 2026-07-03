@@ -57,8 +57,8 @@ constexpr int kBoldLettersFontAssetId = 0x6EC; // SPRITE_BOLD_FONT_LETTERS_ALPHA
 constexpr int kJpFontFreeDelayFrames = 5;      // grace frames before freeing slot 2
 int sFontLanguageGen = 0;
 int sJpFontFreeDelay = 0;
-bool sDialogFontOverridden = false;            // slot 0 currently holds a pack's glyph sheet
-bool sBoldFontOverridden = false;              // bold-letters font currently holds a pack's glyph sheet
+bool sDialogFontOverridden = false; // slot 0 currently holds a pack's glyph sheet
+bool sBoldFontOverridden = false;   // bold-letters font currently holds a pack's glyph sheet
 
 void FreeJpFontSlot() {
     if (print_sFonts[2] != nullptr) {
@@ -157,7 +157,6 @@ extern "C" void port_setPrintScale(float scale) {
         print_sCurrentPtr->scale = scale;
     }
 }
-
 
 // JP parade subtitles
 struct ParadeKana {
@@ -267,6 +266,9 @@ static const LocalizedUiString sUiStrings[] = {
     { "RETURN TO GAME", (const u8*)"\xfd\x6a\x7f\x3b\x70\xcf\xdc\xf4\xe2", (const u8*)"CONTINUER",
       (const u8*)"ZUR]CK ZUM SPIEL" },
     { "EXIT TO WITCH'S LAIR", (const u8*)"\xfd\x6a\x6e\x82\x4d\xd2\xcd\xe1\xf3\xd6\xcf\xdc\xf4\xe2",
+      (const u8*)"ANTRE DE LA SORCI\x63RE", (const u8*)"ZUR HEXENH\\HLE" },
+    // Spiral Mountain variant of the Return-to-Lair option; reuses the lair translations.
+    { "GO TO GRUNTY'S LAIR", (const u8*)"\xfd\x6a\x6e\x82\x4d\xd2\xcd\xe1\xf3\xd6\xcf\xdc\xf4\xe2",
       (const u8*)"ANTRE DE LA SORCI\x63RE", (const u8*)"ZUR HEXENH\\HLE" },
     { "VIEW TOTALS", (const u8*)"\xfd\x6a\x63\x3b\x5f\x78\xb8\xd9\xe2", (const u8*)"STATISTIQUES",
       (const u8*)"STATISTIK" },

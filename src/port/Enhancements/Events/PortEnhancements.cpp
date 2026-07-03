@@ -12,6 +12,7 @@
 
 void PortEnhancements_Init() {
     PortEnhancements_Register();
+    // LoadGuiTextures();
 }
 
 void PortEnhancements_Register() {
@@ -23,6 +24,8 @@ void PortEnhancements_Register() {
     REGISTER_EVENT(OnDialogLoaded);
     REGISTER_EVENT(OnModelLoad);
     REGISTER_EVENT(ViewportFrustumUpdate);
+    REGISTER_EVENT(OnTransitionModelScale);
+    REGISTER_EVENT(OnTransitionStateUpdate);
     REGISTER_EVENT(DrawDistanceCubeWidth);
     REGISTER_EVENT(OnActorTick);
     REGISTER_EVENT(OnPropTick);
@@ -50,6 +53,7 @@ void PortEnhancements_Register() {
     // Register behavior events
     REGISTER_EVENT(OnBeakSwimVelocitySet);
     REGISTER_EVENT(OnBoggyRaceSetSpeed);
+    REGISTER_EVENT(OnMrVileSetSpeed);
     REGISTER_EVENT(OnFurnaceFunDialog);
     REGISTER_EVENT(OnGeoCull);
     REGISTER_EVENT(OnGruntyJinjonatorComplete);
@@ -70,6 +74,7 @@ void PortEnhancements_Register() {
     // Register game events
     REGISTER_EVENT(OnGameLoad);
     REGISTER_EVENT(OnGameSave);
+    REGISTER_EVENT(OnBottlesBonusComplete);
     REGISTER_EVENT(OnSaveFileLoad);
     REGISTER_EVENT(OnSaveFileSave);
     REGISTER_EVENT(OnSaveClear);
@@ -102,6 +107,7 @@ void PortEnhancements_Register() {
     REGISTER_EVENT(OnIsHoneycombScoreCollected);
     REGISTER_EVENT(ClearBundleDespawnQueue);
     REGISTER_EVENT(OnIsMumboTokenScoreCollected);
+    REGISTER_EVENT(OnSnSItemState);
 
     Rando::Init();
 }

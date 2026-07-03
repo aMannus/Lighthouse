@@ -559,18 +559,14 @@ void __baMarker_resolveCollision(Prop *other_prop){
                     if (jiggy_id == JIGGY_20_BGS_ELEVATED_WALKWAY || jiggy_id == JIGGY_25_BGS_MAZE) {
                         func_802D6924();
                     }
-                    if (EventSystem_Should(VB_PLAY_JIGGY_DANCE, true)) {
-                        if (jiggyscore_total() < 3) {
-                            __baMarker_8028B848();
-                        }
+                    if (jiggyscore_total() < 3) {
+                        __baMarker_8028B848();
                     }
 
-                    if (func_8025AD7C(COMUSIC_30_5TH_JINJO_COLLECTED)) {
+                    if (func_8025AD7C(COMUSIC_30_5TH_JINJO_COLLECTED) && EventSystem_Should(VB_PLAY_JIGGY_DANCE, true)) {
                         __baMarker_8028B8DC();
                     }
-                    if (EventSystem_Should(VB_PLAY_JIGGY_DANCE, true)) {
-                       __spawnQueue_add_4((GenFunction_4)__baMarker_8028B904, reinterpret_cast(u32, other_prop->actorProp.x), reinterpret_cast(u32, other_prop->actorProp.y), reinterpret_cast(u32, other_prop->actorProp.z), jiggy_id);
-                    }
+                    __spawnQueue_add_4((GenFunction_4)__baMarker_8028B904, reinterpret_cast(u32, other_prop->actorProp.x), reinterpret_cast(u32, other_prop->actorProp.y), reinterpret_cast(u32, other_prop->actorProp.z), jiggy_id);
                     marker_despawn(marker);
                 }
             }
@@ -625,26 +621,28 @@ void __baMarker_resolveCollision(Prop *other_prop){
 
             case MARKER_169_SNS_EGG: //L8028C908
             { //ONLY THIS CASE DOESN'T MATCH
-                switch (gsworld_getMap())
-                {
-                case MAP_1D_MMM_CELLAR: //L8028C95C
-                    sns_set_item_and_update_payload(SNS_ITEM_EGG_CYAN, 0, 1);
-                    break;
-                case MAP_61_CCW_WINTER_NABNUTS_HOUSE: //L8028C974
-                    sns_set_item_and_update_payload(SNS_ITEM_EGG_YELLOW, 0, 1);
-                    break;
-                case MAP_2C_MMM_BATHROOM: //L8028C988
-                    sns_set_item_and_update_payload(SNS_ITEM_EGG_GREEN, 0, 1);
-                    break;
-                case MAP_3F_RBB_CAPTAINS_CABIN: //L8028C99C
-                    sns_set_item_and_update_payload(SNS_ITEM_EGG_RED, 0, 1);
-                    break;
-                case MAP_92_GV_SNS_CHAMBER: //L8028C9B0
-                    sns_set_item_and_update_payload(SNS_ITEM_EGG_BLUE, 0, 1);
-                    break;
-                case MAP_8F_TTC_SHARKFOOD_ISLAND: //L8028C9C4
-                    sns_set_item_and_update_payload(SNS_ITEM_EGG_PINK, 0, 1);
-                    break;
+                if (!EventSystem_Should(VB_OVERRIDE_SNS_MAP_CHECK, false)) {
+                    switch (gsworld_getMap())
+                    {
+                    case MAP_1D_MMM_CELLAR: //L8028C95C
+                        sns_set_item_and_update_payload(SNS_ITEM_EGG_CYAN, 0, 1);
+                        break;
+                    case MAP_61_CCW_WINTER_NABNUTS_HOUSE: //L8028C974
+                        sns_set_item_and_update_payload(SNS_ITEM_EGG_YELLOW, 0, 1);
+                        break;
+                    case MAP_2C_MMM_BATHROOM: //L8028C988
+                        sns_set_item_and_update_payload(SNS_ITEM_EGG_GREEN, 0, 1);
+                        break;
+                    case MAP_3F_RBB_CAPTAINS_CABIN: //L8028C99C
+                        sns_set_item_and_update_payload(SNS_ITEM_EGG_RED, 0, 1);
+                        break;
+                    case MAP_92_GV_SNS_CHAMBER: //L8028C9B0
+                        sns_set_item_and_update_payload(SNS_ITEM_EGG_BLUE, 0, 1);
+                        break;
+                    case MAP_8F_TTC_SHARKFOOD_ISLAND: //L8028C9C4
+                        sns_set_item_and_update_payload(SNS_ITEM_EGG_PINK, 0, 1);
+                        break;
+                    }
                 }
                 comusic_playTrack(COMUSIC_88_BIG_SNS_FANFARE);
                 FUNC_8030E624(SFX_114_BRICKWALL_BREAKING, 0.8f, 15000);

@@ -3,8 +3,10 @@
 #include <spdlog/spdlog.h>
 #include <libultraship/bridge/consolevariablebridge.h>
 #include "port/Enhancements/Events/Hooks/Events.h"
+#include "port/ShipInit.hpp"
 #include "port/ShipUtils.h"
-#include "port/Romhack/RomhackConfig.h"
+#include "port/UI/cvar_prefixes.h"
+#include "port/UI/LighthouseModMenuWindow.h"
 #include <fstream>
 #include <filesystem>
 #include <regex>
@@ -28,11 +30,12 @@ using nlohmann::ordered_json;
 namespace fs = std::filesystem;
 static bool mLoaded = false;
 
+#define CVAR_NAME_BOTTLES_BONUS CVAR_ENHANCEMENT("Saving.PersistBottlesBonus")
+
 std::string SaveManager_GetSavePath(const std::string& filename) {
-    const char* romName = port_getRomhackName();
-    std::string dir = Ship_IsCStringEmpty(romName)
-                          ? Ship::Context::GetPathRelativeToAppDirectory("saves")
-                          : Ship::Context::GetPathRelativeToAppDirectory("saves/~romhacks/" + std::string(romName));
+    std::string romName = GetActiveRomhackBasename();
+    std::string dir = romName.empty() ? Ship::Context::GetPathRelativeToAppDirectory("saves")
+                                      : Ship::Context::GetPathRelativeToAppDirectory("saves/~romhacks/" + romName);
     std::error_code ec;
     fs::create_directories(dir, ec);
     if (ec) {
@@ -297,6 +300,7 @@ ordered_json Convert_SaveDataToJSON(SaveData* saveData, int32_t fileNum) {
     ordered_json shipRando = ordered_json::object();
 
     ship["fileType"] = static_cast<int>(saveData->shipSaveData.fileType);
+    ship["fileCreatedAt"] = static_cast<int>(saveData->shipSaveData.fileCreatedAt);
 
     // Note retention (all files): sparse per-map collected bitfields.
     ordered_json noteRetention = ordered_json::object();
@@ -550,6 +554,7 @@ SaveData* Convert_JSONToSaveData(int32_t fileNum) {
 
     // Ship Save Data
     saveData->shipSaveData.fileType = j["ship"]["fileType"];
+    saveData->shipSaveData.fileCreatedAt = j["ship"]["fileCreatedAt"];
 
     // Note retention (all files): clear then load sparse per-map bitfields.
     for (int m = 0; m < NOTE_RETENTION_MAP_SLOTS; m++) {
@@ -644,8 +649,9 @@ static void LoadGlobalData() {
         }
     }
 
-    // Bottles Bonus
-    if (j.contains("bottlesBonusCompleted")) {
+    // Bottles Bonus: only restore from the global save when persistence is enabled.
+    // With it off, completion stays session-only (vanilla), reset at file select.
+    if (CVarGetInteger(CVAR_NAME_BOTTLES_BONUS, 0) && j.contains("bottlesBonusCompleted")) {
         const auto& bb = j["bottlesBonusCompleted"];
         for (int k = 0; k < 7 && k < (int)bb.size(); k++) {
             gCompletedBottlesBonusGames[k] = bb[k].get<int>() ? 1 : 0;
@@ -747,8 +753,29 @@ void SaveManager_Init() {
         event->Cancelled = true;
     });
 
+    REGISTER_LISTENER(OnGameLoad, EVENT_PRIORITY_NORMAL, [](IEvent* event) {
+        OnGameLoad* ev = (OnGameLoad*)event;
+        gSelectedFileNum = ev->fileNum;
+    });
+
+    REGISTER_LISTENER(OnSaveLoad, EVENT_PRIORITY_NORMAL, [](IEvent* event) {
+        OnSaveLoad* ev = (OnSaveLoad*)event;
+        SaveData* saveData = (SaveData*)ev->saveData;
+
+        if (saveData->magic == 0) {
+            saveData->shipSaveData.fileCreatedAt = GetUnixTimestamp();
+        }
+    });
+
     // Decomp clears global arrays (e.g. gCompletedBottlesBonusGames) just before
     // gameFile_load fires OnGameLoad. Restore them from global.json here before
     // other OnGameLoad listeners read them.
     REGISTER_LISTENER(OnGameLoad, EVENT_PRIORITY_HIGH, [](IEvent* event) { LoadGlobalData(); });
 }
+
+static void RegisterPersistBottlesBonus_Init() {
+    COND_HOOK(OnBottlesBonusComplete, EVENT_PRIORITY_NORMAL, CVarGetInteger(CVAR_NAME_BOTTLES_BONUS, 0),
+              [](IEvent* event) { SaveGlobalData(); });
+}
+
+static RegisterShipInitFunc initPersistBottlesBonus(RegisterPersistBottlesBonus_Init, { CVAR_NAME_BOTTLES_BONUS });

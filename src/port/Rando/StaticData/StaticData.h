@@ -25,7 +25,7 @@ struct RandoStaticCheck {
     const char* name;
     RandoCheckType randoCheckType;
     int32_t worldId;
-    int32_t actorId;
+    RandoItemId randoItemId;
     int32_t collectionId;
     int32_t posX;
     int32_t posY;
@@ -52,6 +52,7 @@ struct RandoStaticItem {
 };
 
 RandoItemId GetRandoItemByActorId(actor_e actorId);
+actor_e GetActorIdByRandoItemId(RandoItemId randoItemId);
 
 extern std::map<RandoItemId, RandoStaticItem> Items;
 

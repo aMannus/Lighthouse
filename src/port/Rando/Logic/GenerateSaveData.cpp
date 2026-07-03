@@ -3,6 +3,7 @@
 #include <libultraship/bridge/consolevariablebridge.h>
 #include "port/UI/cvar_prefixes.h"
 #include "port/Enhancements/Events/Hooks/Events.h"
+#include "port/Rando/CustomObject/CustomObject.h"
 
 #include "port/Save/Types.h"
 
@@ -101,6 +102,21 @@ std::vector<file_progress_e> progressLoadout = {
     //FILEPROG_F4_ENTER_FF_CUTSCENE,
 
 };
+
+std::vector<RandoCheckId> smRandoCheckIdList = {
+    RC_SM_EMPTY_HONEYCOMB_COLLIWOBBLE,
+    RC_SM_EMPTY_HONEYCOMB_QUARRIES,
+    RC_SM_EMPTY_HONEYCOMB_STUMP,
+    RC_SM_EMPTY_HONEYCOMB_TREE,
+    RC_SM_EMPTY_HONEYCOMB_UNDERWATER,
+    RC_SM_EMPTY_HONEYCOMB_WATERFALL,
+    RC_SM_MOLEHILL_ATTACK,
+    RC_SM_MOLEHILL_BEAK_BARGE,
+    RC_SM_MOLEHILL_CAMERA_CONTROL,
+    RC_SM_MOLEHILL_CLIMB,
+    RC_SM_MOLEHILL_DIVE,
+    RC_SM_MOLEHILL_JUMP,
+};
 // clang-format on
 
 void Rando::Logic::InitializeSaveData(SaveData* saveData) {
@@ -108,7 +124,8 @@ void Rando::Logic::InitializeSaveData(SaveData* saveData) {
     for (auto& [randoCheckId, randoStaticCheck] : Rando::StaticData::Checks) {
         RandoSaveCheck randoSaveCheck = {
             .name = randoStaticCheck.name,
-            .randoItemId = Rando::StaticData::GetRandoItemByActorId((actor_e)randoStaticCheck.actorId),
+            .randoItemId = randoStaticCheck.randoItemId,
+            // .randoItemId = Rando::StaticData::GetRandoItemByActorId((actor_e)randoStaticCheck.actorId),
             .shuffledCheckId = randoCheckId,
             .randoCollectionId = randoStaticCheck.collectionId,
             .isShuffled = false,
@@ -160,5 +177,17 @@ void Rando::Logic::GrantStartingLoadout() {
     // Set progress flag for tutorial dialogue, skipping them
     for (auto& fileprog : progressLoadout) {
         fileProgressFlag_set(fileprog, 1);
+    }
+
+    if (CVarGetInteger(CVAR_ENHANCEMENT("Gameplay.SkipSMTutorial"), 0)) {
+        for (auto& smCheckId : smRandoCheckIdList) {
+            RandoSaveCheck randoSaveCheck = RANDO_SAVE_CHECKS[smCheckId];
+
+            if (!randoSaveCheck.isShuffled) {
+                continue;
+            }
+
+            CustomObject::CheckObtainedEX(smCheckId, true);
+        }
     }
 }

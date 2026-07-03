@@ -24,7 +24,8 @@ void Rando::ObjectBehavior::InitMusicNoteBehavior() {
                 continue;
             }
 
-            if (pool.randoItemId == RI_MUSIC_NOTE) {
+            actor_e actorId = Rando::StaticData::GetActorIdByRandoItemId(pool.randoItemId);
+            if (actorId == ACTOR_51_MUSIC_NOTE) {
                 if (pool.obtained) {
                     currentNotes++;
                 }

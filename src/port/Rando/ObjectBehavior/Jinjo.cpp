@@ -27,7 +27,8 @@ void Rando::ObjectBehavior::InitJinjoBehavior() {
                 continue;
             }
 
-            if (pool.randoItemId >= RI_JINJO_BLUE && pool.randoItemId <= RI_JINJO_YELLOW) {
+            actor_e actorId = Rando::StaticData::GetActorIdByRandoItemId(pool.randoItemId);
+            if (actorId >= ACTOR_5E_JINJO_YELLOW && actorId <= ACTOR_62_JINJO_GREEN) {
                 int32_t jinjoMarkerId =
                     GetJinjoActorMarkerId((actor_e)Rando::StaticData::Items[pool.randoItemId].actorId);
                 item_adjustByDiffWithHud(ITEM_12_JINJOS, (1 << ((jinjoMarkerId + 6) & 0x1F)));

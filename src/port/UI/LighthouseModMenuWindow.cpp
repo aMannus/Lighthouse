@@ -231,6 +231,10 @@ static std::string GetActiveHack() {
     return "";
 }
 
+std::string GetActiveRomhackBasename() {
+    return GetActiveHack();
+}
+
 static bool ShownInModMenu(const std::string& name, const std::string& activeHack) {
     auto it = modCategory.find(name);
     if (it == modCategory.end()) {
@@ -933,9 +937,12 @@ void DrawInlineModExtraction() {
         try {
             std::filesystem::path produced(GameExtractor::sLastOutputPath);
             if (std::filesystem::exists(produced) && ArchiveHasGameConfig(produced)) {
-                std::filesystem::path dest = produced.parent_path() / ROMHACKS_DIR / produced.filename();
-                if (produced != dest) {
-                    std::filesystem::create_directories(dest.parent_path());
+                std::filesystem::path romhacksDir =
+                    std::filesystem::path(Ship::Context::GetPathRelativeToAppDirectory("mods")) / ROMHACKS_DIR;
+                std::filesystem::path dest = romhacksDir / produced.filename();
+                std::error_code same;
+                if (!std::filesystem::equivalent(produced, dest, same)) {
+                    std::filesystem::create_directories(romhacksDir);
                     std::error_code rec;
                     std::filesystem::remove(dest, rec); // replace a prior overlay of the same name
                     std::filesystem::rename(produced, dest);

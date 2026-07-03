@@ -216,6 +216,7 @@ extern "C" void port_shapeControllerInput(void* contPad) {
 
     const bool modern = CVarGetInteger(CVAR_SETTING("Controls.Scheme"), CONTROL_SCHEME_RETRO) == CONTROL_SCHEME_MODERN;
     const bool crouched = (bs_getState() == BS_CROUCH);
+    const bool eggPooping = (bs_getState() == BS_A_EGG_ASS);
 
     int32_t rx = pad->right_stick_x;
     int32_t ry = pad->right_stick_y;
@@ -223,7 +224,7 @@ extern "C" void port_shapeControllerInput(void* contPad) {
     int32_t ary = (ry < 0) ? -ry : ry;
 
     if (modern) {
-        if (!crouched) {
+        if (!crouched && !eggPooping) {
             pad->button &= ~BTN_CDOWN;
         }
 
@@ -418,7 +419,8 @@ extern "C" void port_shapeControllerInput(void* contPad) {
     static bool sBWasHeld = false;
     const int32_t kBHoldFrames = 12; // ~0.2s before a standing press counts as a hold
     bool bHeld = (pad->button & BTN_CDOWN) != 0;
-    if (CVarGetInteger(CVAR_SETTING("Controls.Scheme"), CONTROL_SCHEME_RETRO) == CONTROL_SCHEME_POCKET && !crouched) {
+    if (CVarGetInteger(CVAR_SETTING("Controls.Scheme"), CONTROL_SCHEME_RETRO) == CONTROL_SCHEME_POCKET && !crouched &&
+        !eggPooping) {
         pad->button &= ~BTN_CDOWN;
         if (bHeld) {
             if (sBHeldFrames < kBHoldFrames) {
@@ -441,24 +443,38 @@ extern "C" void port_shapeControllerInput(void* contPad) {
     }
     sBWasHeld = bHeld;
 
-    // Pocket: tip-toe
-    //  Simulate lightly touching the analog stick
+    // Pocket: Talon Trot (LT + RT) and tip-toe (RT)
+    //  LT crouches. While crouched, an RT press injects C-Left to start the Talon Trot.
+    //  RT on its own (no crouch) lightly touches the analog stick for a tip-toe.
     static bool sTipToe = false;
     static bool sPrevR2 = false;
     if (CVarGetInteger(CVAR_SETTING("Controls.Scheme"), CONTROL_SCHEME_RETRO) == CONTROL_SCHEME_POCKET) {
         bool r2 = false;
+        bool l2 = false;
         auto ctx = Ship::Context::GetRawInstance();
         auto controlDeck = ctx != nullptr ? ctx->GetControlDeck() : nullptr;
         auto deviceManager = controlDeck != nullptr ? controlDeck->GetConnectedPhysicalDeviceManager() : nullptr;
         if (deviceManager != nullptr) {
             for (auto& [instanceId, gamepad] : deviceManager->GetConnectedSDLGamepadsForPort(0)) {
-                if (gamepad != nullptr && SDL_GameControllerGetAxis(gamepad, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 8000) {
+                if (gamepad == nullptr) {
+                    continue;
+                }
+                if (SDL_GameControllerGetAxis(gamepad, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 8000) {
                     r2 = true;
+                }
+                if (SDL_GameControllerGetAxis(gamepad, SDL_CONTROLLER_AXIS_TRIGGERLEFT) > 8000) {
+                    l2 = true;
                 }
             }
         }
 
-        if (CVarGetInteger(CVAR_SETTING("Controls.PocketTipToeHold"), 0) != 0) {
+        if (l2) {
+            // Crouching: RT is the Talon Trot trigger, not tip-toe.
+            if (crouched && r2 && !sPrevR2) {
+                pad->button |= BTN_CLEFT; // C-Left while crouched starts the Talon Trot
+            }
+            sTipToe = false;
+        } else if (CVarGetInteger(CVAR_SETTING("Controls.PocketTipToeHold"), 0) != 0) {
             sTipToe = r2; // hold mode
         } else if (r2 && !sPrevR2) {
             sTipToe = !sTipToe; // tap toggles

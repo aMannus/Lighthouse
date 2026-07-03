@@ -5,6 +5,7 @@
 #include "port/Enhancements/Events/Hooks/Events.h"
 
 #include "actor.h"
+#include "include/core1/sns.h"
 
 #include "spdlog/spdlog.h"
 
@@ -30,6 +31,8 @@ void fxSparkle_musicNote(s16 position[3]);
 void player_getPosition(f32 dst[3]);
 void ml_vec3f_to_vec3h(s16 dst[3], f32 src[3]);
 
+void gcparade_beginFinalParade(void);
+
 void coMusicPlayer_playMusic(enum comusic_e track_id, s32 volume);
 Actor* marker_getActor(ActorMarker* thisx);
 void marker_despawn(ActorMarker* marker);
@@ -48,6 +51,9 @@ extern ActorInfo D_80366CA4;
 extern ActorInfo D_80367D00;
 extern ActorInfo D_80367D24;
 extern ActorInfo D_80367D48;
+
+extern ActorInfo D_80367814;
+extern ActorInfo D_803677A8;
 }
 
 typedef struct {
@@ -75,6 +81,8 @@ std::map<actor_e, std::pair<ActorInfo, int32_t>> actorInfoMap = {
     { ACTOR_52_BLUE_EGG,        { D_80367D00,       ACTOR_FLAG_UNKNOWN_21 } },
     { ACTOR_129_RED_FEATHER,    { D_80367D24,       ACTOR_FLAG_UNKNOWN_21 } },
     { ACTOR_370_GOLD_FEATHER,   { D_80367D48,       ACTOR_FLAG_UNKNOWN_21 } },
+    { ACTOR_25E_SNS_EGG,        { D_80367814,       ACTOR_FLAG_UNKNOWN_9 | ACTOR_FLAG_UNKNOWN_10 | ACTOR_FLAG_UNKNOWN_15 } },
+    { ACTOR_25D_ICE_KEY,        { D_803677A8,       ACTOR_FLAG_UNKNOWN_9 | ACTOR_FLAG_UNKNOWN_10 | ACTOR_FLAG_UNKNOWN_15 } },
 };
 // clang-format on
 
@@ -119,24 +127,33 @@ void CustomObject::RemoveSpawnedIdFromList(RandoCheckId randoCheckId) {
 }
 
 Actor* CustomObject::SetCustomActorParametersEX(RandoCheckId randoCheckId, Actor* customActor) {
-    RandoSaveCheck shuffledObject = Rando::Logic::GetShuffledObject(randoCheckId);
+    RandoSaveCheck randoSaveCheck = RANDO_SAVE_CHECKS[randoCheckId];
     customActor->marker->randoCheckId = randoCheckId;
 
-    switch (shuffledObject.randoItemId) {
-        case RI_EMPTY_HONEYCOMB:
+    actor_e actorId = Rando::StaticData::GetActorIdByRandoItemId(randoSaveCheck.randoItemId);
+    switch (actorId) {
+        case ACTOR_47_EMPTY_HONEYCOMB:
             ActorLocal_EmptyHoneycomb* honeycombLocal;
             honeycombLocal = (ActorLocal_EmptyHoneycomb*)&customActor->local;
             honeycombLocal->uid = (honeycomb_e)Rando::Logic::GetShuffledObject(randoCheckId).randoCollectionId;
             break;
-        case RI_JIGGY:
+        case ACTOR_46_JIGGY:
             ActorLocal_Jiggy* jiggyLocal;
             jiggyLocal = (ActorLocal_Jiggy*)&customActor->local;
-            jiggyLocal->index = shuffledObject.randoCollectionId;
+            jiggyLocal->index = randoSaveCheck.randoCollectionId;
             break;
-        case RI_MUMBO_TOKEN:
+        case ACTOR_2D_MUMBO_TOKEN:
             ActorLocal_MumboToken* tokenLocal;
             tokenLocal = (ActorLocal_MumboToken*)&customActor->local;
             tokenLocal->uid = (mumbotoken_e)Rando::Logic::GetShuffledObject(randoCheckId).randoCollectionId;
+            break;
+        case ACTOR_25E_SNS_EGG:
+        case ACTOR_25D_ICE_KEY:
+            customActor->actorTypeSpecificField = randoSaveCheck.randoCollectionId;
+            customActor->scale = 0.5f;
+            if (actorId == ACTOR_25D_ICE_KEY) {
+                customActor->position_y += 50.0f;
+            }
             break;
         default:
             break;
@@ -160,6 +177,10 @@ Actor* CustomObject::SpawnCustomActorEX(RandoCheckId randoCheckId, int32_t posit
 }
 
 void CustomObject::FlushRandoSpawnQueue() {
+    if (gsworld_getMap() == MAP_91_FILE_SELECT) {
+        return;
+    }
+
     if (randoActorQueue.empty()) {
         return;
     }
@@ -180,7 +201,7 @@ void CustomObject::FlushRandoSpawnQueue() {
             continue;
         }
 
-        actor_e randoActorId = (actor_e)Rando::StaticData::Items[randoSaveCheck.randoItemId].actorId;
+        actor_e randoActorId = Rando::StaticData::GetActorIdByRandoItemId(randoSaveCheck.randoItemId);
         if (randoSaveCheck.obtained) {
             randoActorId = GetRandomJunkActorId(randoSaveCheck);
         }
@@ -248,8 +269,8 @@ Actor* CustomObject::ShouldCreateCustomActorEX(RandoCheckId randoCheckId, int32_
 }
 
 void CustomObject::ResolveCustomActorCollisionEX(RandoCheckId randoCheckId) {
-    RandoSaveCheck shuffledObject = Rando::Logic::GetShuffledObject(randoCheckId);
-    if (shuffledObject.randoCheckId == RC_UNKNOWN) {
+    RandoSaveCheck randoSaveCheck = RANDO_SAVE_CHECKS[randoCheckId];
+    if (randoSaveCheck.randoCheckId == RC_UNKNOWN) {
         return;
     }
 
@@ -262,27 +283,28 @@ void CustomObject::ResolveCustomActorCollisionEX(RandoCheckId randoCheckId) {
     spawnPosition[1] = (int32_t)playerPosF[1];
     spawnPosition[2] = (int32_t)playerPosF[2];
 
-    switch (shuffledObject.randoItemId) {
-        case RI_JIGGY:
+    actor_e actorId = Rando::StaticData::GetActorIdByRandoItemId(randoSaveCheck.randoItemId);
+    int32_t currentLevel = map_getLevel(gsworld_getMap());
+    switch (actorId) {
+        case ACTOR_46_JIGGY:
             if (CVarGetInteger(CVAR_ENHANCEMENT("Cutscenes.SkipJiggyDance"), 0)) {
                 fxSparkle_musicNote(sparklePos);
-                coMusicPlayer_playMusic(COMUSIC_D_JINGLE_JIGGY_COLLECTED, -1);
             }
             break;
-        case RI_JINJO_BLUE:
-        case RI_JINJO_GREEN:
-        case RI_JINJO_ORANGE:
-        case RI_JINJO_PINK:
-        case RI_JINJO_YELLOW:
-            if (Rando::StaticData::Checks[shuffledObject.shuffledCheckId].worldId == map_getLevel(gsworld_getMap())) {
+        case ACTOR_5E_JINJO_YELLOW:
+        case ACTOR_5F_JINJO_ORANGE:
+        case ACTOR_60_JINJO_BLUE:
+        case ACTOR_61_JINJO_PINK:
+        case ACTOR_62_JINJO_GREEN:
+            if (Rando::StaticData::Checks[randoSaveCheck.shuffledCheckId].worldId == currentLevel) {
                 int32_t jinjoMarkerId =
-                    GetJinjoActorMarkerId((actor_e)Rando::StaticData::Items[shuffledObject.randoItemId].actorId);
+                    GetJinjoActorMarkerId((actor_e)Rando::StaticData::Items[randoSaveCheck.randoItemId].actorId);
                 item_adjustByDiffWithHud(ITEM_12_JINJOS, (1 << ((jinjoMarkerId + 6) & 0x1F)));
             } else {
                 if (Rando::Logic::ShouldSpawnJinjoJiggy(
-                        Rando::StaticData::Checks[shuffledObject.shuffledCheckId].worldId)) {
+                        Rando::StaticData::Checks[randoSaveCheck.shuffledCheckId].worldId)) {
                     RandoCheckId jiggyCheckId = Rando::StaticData::GetJinjoJiggyCheckByLevelId(
-                        Rando::StaticData::Checks[shuffledObject.shuffledCheckId].worldId);
+                        Rando::StaticData::Checks[randoSaveCheck.shuffledCheckId].worldId);
 
                     if (jiggyCheckId != RC_UNKNOWN) {
                         Actor* customActor = ShouldCreateCustomActorEX(jiggyCheckId, spawnPosition, false);
@@ -293,9 +315,9 @@ void CustomObject::ResolveCustomActorCollisionEX(RandoCheckId randoCheckId) {
                 }
             }
             break;
-        case RI_MUSIC_NOTE:
-            D_80385FF0[Rando::StaticData::Checks[shuffledObject.shuffledCheckId].worldId]++;
-            if (Rando::StaticData::Checks[shuffledObject.shuffledCheckId].worldId == map_getLevel(gsworld_getMap())) {
+        case ACTOR_51_MUSIC_NOTE:
+            D_80385FF0[Rando::StaticData::Checks[randoSaveCheck.shuffledCheckId].worldId]++;
+            if (Rando::StaticData::Checks[randoSaveCheck.shuffledCheckId].worldId == currentLevel) {
                 item_set(ITEM_C_NOTE, D_80385FF0[map_getLevel(gsworld_getMap())]);
             }
 
@@ -303,19 +325,27 @@ void CustomObject::ResolveCustomActorCollisionEX(RandoCheckId randoCheckId) {
             fxSparkle_musicNote(sparklePos);
             coMusicPlayer_playMusic(COMUSIC_9_NOTE_COLLECTED, 16000);
             break;
+        case ACTOR_25E_SNS_EGG:
+        case ACTOR_25D_ICE_KEY:
+            if (Rando::Logic::GetTotalSnsItemsCollected() >= 7) {
+                gcparade_beginFinalParade();
+            }
+            break;
         default:
             break;
     }
 }
 
-void CustomObject::CheckObtainedEX(RandoCheckId randoCheckId) {
+void CustomObject::CheckObtainedEX(RandoCheckId randoCheckId, bool isInit) {
     for (auto& pool : Rando::Logic::shuffledPool) {
         if (pool.randoCheckId == randoCheckId && !pool.obtained) {
             pool.obtained = true;
             shouldRemoveEX = true;
             RANDO_SAVE_CHECKS[pool.randoCheckId].obtained = true;
             CustomObject::RemoveSpawnedIdFromList(randoCheckId);
-            Rando::StaticData::SendCollisionNotification(pool.randoCheckId);
+            if (!isInit) {
+                Rando::StaticData::SendCollisionNotification(pool.randoCheckId);
+            }
             Rando::StaticData::ModifyRandoInfFlagState(randoCheckId);
             Rando::Logic::RefreshReachableRegions();
             break;
@@ -328,10 +358,11 @@ void CustomObject::ObjectCollectedEX(Prop* prop) {
     CustomObject::CheckObtainedEX((RandoCheckId)prop->actorProp.marker->randoCheckId);
 
     if (shouldRemoveEX) {
-        CustomObject::ResolveCustomActorCollisionEX((RandoCheckId)prop->actorProp.marker->randoCheckId);
+        RandoSaveCheck randoSaveCheck = RANDO_SAVE_CHECKS[(RandoCheckId)prop->actorProp.marker->randoCheckId];
 
-        if (Rando::Logic::GetShuffledObject((RandoCheckId)prop->actorProp.marker->randoCheckId).randoItemId ==
-            RI_MUSIC_NOTE) {
+        CustomObject::ResolveCustomActorCollisionEX(randoSaveCheck.randoCheckId);
+
+        if (Rando::StaticData::GetActorIdByRandoItemId(randoSaveCheck.randoItemId) == ACTOR_51_MUSIC_NOTE) {
             marker_despawn(prop->actorProp.marker);
         }
     }
