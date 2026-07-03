@@ -35,6 +35,8 @@
 // #include "DeveloperTools/EventLog.h"
 // #include "DeveloperTools/DLViewer.h"
 // #include "DeveloperTools/MessageViewer.h"
+#include "port/Archipelago/ArchipelagoSettingsWindow.h"
+#include "port/Archipelago/ArchipelagoConsoleWindow.h"
 
 namespace LighthouseGui {
 // MARK: - Delegates
@@ -66,6 +68,8 @@ std::shared_ptr<Rando::CheckTracker::SettingsWindow> mRandoCheckTrackerSettingsW
 std::shared_ptr<DisplayOverlayWindow> mDisplayOverlayWindow;
 // std::shared_ptr<TimesplitsWindow> mTimesplitsWindow;
 // std::shared_ptr<TimesplitsSettingsWindow> mTimesplitsSettingsWindow;
+std::shared_ptr<ArchipelagoSettingsWindow> mArchipelagoSettingsWindow;
+std::shared_ptr<ArchipelagoConsoleWindow> mArchipelagoConsoleWindow;
 std::shared_ptr<InputViewer> mInputViewer;
 std::shared_ptr<InputViewerSettingsWindow> mInputViewerSettings;
 std::shared_ptr<EggAimCrosshairWindow> mEggAimCrosshair;
@@ -175,6 +179,13 @@ void SetupGuiElements() {
     //     "gWindows.Timesplits.Settings", "Time Splits Settings Window", ImVec2(567, 97));
     // gui->AddGuiWindow(mTimesplitsSettingsWindow);
 
+    mArchipelagoSettingsWindow = std::make_shared<ArchipelagoSettingsWindow>(CVAR_WINDOW("ArchipelagoSettingsWindow"),
+                                                                             "Archipelago Settings", ImVec2(600, 450));
+    gui->AddGuiWindow(mArchipelagoSettingsWindow);
+    mArchipelagoConsoleWindow = std::make_shared<ArchipelagoConsoleWindow>(CVAR_WINDOW("ArchipelagoConsoleWindow"),
+                                                                           "Archipelago Console", ImVec2(600, 550));
+    gui->AddGuiWindow(mArchipelagoConsoleWindow);
+
     mNotificationWindow = std::make_shared<Notification::Window>("gWindows.Notifications", "Notifications Window");
     gui->AddGuiWindow(mNotificationWindow);
     mNotificationWindow->Show();
@@ -232,6 +243,8 @@ void Destroy() {
     // mItemTrackerWindow = nullptr;
     // mItemTrackerSettingsWindow = nullptr;
     mDisplayOverlayWindow = nullptr;
+    mArchipelagoSettingsWindow = nullptr;
+    mArchipelagoConsoleWindow = nullptr;
     mInputViewer = nullptr;
     mInputViewerSettings = nullptr;
     mEggAimCrosshair = nullptr;
