@@ -2,6 +2,7 @@
 #define RANDO_STATIC_DATA_H
 
 #include <map>
+#include <unordered_map>
 #include <array>
 #include <string>
 #include "port/Rando/Types.h"
@@ -87,6 +88,9 @@ struct RandoStaticFlag {
 extern std::map<RandoInf, RandoStaticFlag> Flags;
 
 void ModifyRandoInfFlagState(RandoCheckId randoCheckId);
+
+extern std::unordered_map<std::string, RandoCheckId> locationNameToEnum;
+extern std::unordered_map<std::string, RandoItemId> itemNameToEnum;
 
 } // namespace StaticData
 

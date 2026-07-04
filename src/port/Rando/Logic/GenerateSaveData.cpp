@@ -4,6 +4,7 @@
 #include "port/UI/cvar_prefixes.h"
 #include "port/Enhancements/Events/Hooks/Events.h"
 #include "port/Rando/CustomObject/CustomObject.h"
+#include "port/Rando/StaticData/StaticData.h"
 
 #include "port/Save/Types.h"
 
@@ -14,6 +15,9 @@ void ability_setHasUsed(enum ability_e move);
 void item_setMaxCount(s32 item);
 void fileProgressFlag_set(enum file_progress_e index, s32 set);
 }
+
+std::unordered_map<std::string, RandoCheckId> Rando::StaticData::locationNameToEnum = {};
+std::unordered_map<std::string, RandoItemId> Rando::StaticData::itemNameToEnum = {};
 
 // clang-format off
 std::map<ability_e, std::pair<const char*, const char*>> abilityLoadoutMap = {
@@ -147,6 +151,18 @@ void Rando::Logic::InitializeSaveData(SaveData* saveData) {
 
     for (int i = RANDO_INF_UNKNOWN; i < RANDO_INF_MAX; i++) {
         saveData->shipSaveData.randoSaveData.randoSaveFlag[i].flagState = 0;
+    }
+
+    for (int i = 0; i < RC_MAX; i++) {
+        RandoCheckId rc = RandoCheckId(i);
+        std::string name = Ship_ConvertEnumToReadableName(Rando::StaticData::Checks[rc].name, true);
+        Rando::StaticData::locationNameToEnum.insert({name, rc});
+    }
+
+    for (int i = 0; i < RI_MAX; i++) {
+        RandoItemId ri = RandoItemId(i);
+        std::string name = Rando::StaticData::Items[ri].name;
+        Rando::StaticData::itemNameToEnum.insert({ name, ri });
     }
 }
 

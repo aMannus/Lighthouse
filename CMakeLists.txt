@@ -628,6 +628,7 @@ if(MSVC)
               /W3;
               /MT
           >
+          /bigobj;
           /permissive-;
           /MP;
           # 32→64-bit pointer truncation warnings as errors

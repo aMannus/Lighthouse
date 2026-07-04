@@ -98,6 +98,7 @@ class ArchipelagoClient {
     std::queue<ApItem> receiveQueue;
 };
 
+void Archipelago_ParseLocations();
 /*
 void LoadArchipelagoData();
 void SaveArchipelagoData(SaveContext* saveContext, int sectionID, bool fullSave);

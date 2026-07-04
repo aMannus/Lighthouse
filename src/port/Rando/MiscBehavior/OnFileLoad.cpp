@@ -2,8 +2,10 @@
 #include <libultraship/bridge/consolevariablebridge.h>
 #include "port/Enhancements/Events/Hooks/Events.h"
 #include "port/UI/Notification.h"
+#include "port/Archipelago/archipelago.h"
 
 #include "port/Save/Types.h"
+#include "port/UI/cvar_prefixes.h"
 
 #include "port/Rando/Logic/Logic.h"
 // #include "port/Rando/Spoiler/Spoiler.h"
@@ -33,9 +35,13 @@ void Rando::MiscBehavior::OnFileLoad() {
             return;
         }
 
-        if (CVarGetInteger("gRandoSettings.Enable", 0)) {
+        if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("Enable"), 0)) {
             Rando::Logic::InitializeSaveData(saveData);
-            Rando::Logic::GenerateShufflePool(saveData);
+            if (ArchipelagoClient::GetInstance().IsConnected()) {
+                Archipelago_ParseLocations();
+            } else {
+                Rando::Logic::GenerateShufflePool(saveData);
+            }
             Rando::Logic::GrantStartingLoadout();
             saveData->shipSaveData.fileType = FILE_TYPE_SAVE_RANDO;
             saveData->shipSaveData.fileCreatedAt = GetUnixTimestamp();
