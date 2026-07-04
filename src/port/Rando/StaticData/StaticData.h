@@ -50,6 +50,7 @@ struct RandoStaticItem {
     const char* name;
     RandoItemType randoItemType;
     int16_t actorId;
+    int16_t worldId;
 };
 
 RandoItemId GetRandoItemByActorId(actor_e actorId);

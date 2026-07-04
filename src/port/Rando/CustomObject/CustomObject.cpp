@@ -283,28 +283,23 @@ void CustomObject::ResolveCustomActorCollisionEX(RandoCheckId randoCheckId) {
     spawnPosition[1] = (int32_t)playerPosF[1];
     spawnPosition[2] = (int32_t)playerPosF[2];
 
-    actor_e actorId = Rando::StaticData::GetActorIdByRandoItemId(randoSaveCheck.randoItemId);
+    Rando::StaticData::RandoStaticItem randoItem = Rando::StaticData::Items[randoSaveCheck.randoItemId];
+    RandoItemType itemType = randoItem.randoItemType;
     int32_t currentLevel = map_getLevel(gsworld_getMap());
-    switch (actorId) {
-        case ACTOR_46_JIGGY:
+
+    switch (itemType) {
+        case RITYPE_JIGGY:
             if (CVarGetInteger(CVAR_ENHANCEMENT("Cutscenes.SkipJiggyDance"), 0)) {
                 fxSparkle_musicNote(sparklePos);
             }
             break;
-        case ACTOR_5E_JINJO_YELLOW:
-        case ACTOR_5F_JINJO_ORANGE:
-        case ACTOR_60_JINJO_BLUE:
-        case ACTOR_61_JINJO_PINK:
-        case ACTOR_62_JINJO_GREEN:
-            if (Rando::StaticData::Checks[randoSaveCheck.shuffledCheckId].worldId == currentLevel) {
-                int32_t jinjoMarkerId =
-                    GetJinjoActorMarkerId((actor_e)Rando::StaticData::Items[randoSaveCheck.randoItemId].actorId);
+        case RITYPE_JINJO:
+            if (randoItem.worldId == currentLevel) {
+                int32_t jinjoMarkerId = GetJinjoActorMarkerId((actor_e)randoItem.actorId);
                 item_adjustByDiffWithHud(ITEM_12_JINJOS, (1 << ((jinjoMarkerId + 6) & 0x1F)));
             } else {
-                if (Rando::Logic::ShouldSpawnJinjoJiggy(
-                        Rando::StaticData::Checks[randoSaveCheck.shuffledCheckId].worldId)) {
-                    RandoCheckId jiggyCheckId = Rando::StaticData::GetJinjoJiggyCheckByLevelId(
-                        Rando::StaticData::Checks[randoSaveCheck.shuffledCheckId].worldId);
+                if (Rando::Logic::ShouldSpawnJinjoJiggy(randoItem.worldId)) {
+                    RandoCheckId jiggyCheckId = Rando::StaticData::GetJinjoJiggyCheckByLevelId(randoItem.worldId);
 
                     if (jiggyCheckId != RC_UNKNOWN) {
                         Actor* customActor = ShouldCreateCustomActorEX(jiggyCheckId, spawnPosition, false);
@@ -315,9 +310,9 @@ void CustomObject::ResolveCustomActorCollisionEX(RandoCheckId randoCheckId) {
                 }
             }
             break;
-        case ACTOR_51_MUSIC_NOTE:
-            D_80385FF0[Rando::StaticData::Checks[randoSaveCheck.shuffledCheckId].worldId]++;
-            if (Rando::StaticData::Checks[randoSaveCheck.shuffledCheckId].worldId == currentLevel) {
+        case RITYPE_MUSIC_NOTE:
+            D_80385FF0[randoItem.worldId]++;
+            if (randoItem.worldId == currentLevel) {
                 item_set(ITEM_C_NOTE, D_80385FF0[map_getLevel(gsworld_getMap())]);
             }
 
@@ -325,8 +320,8 @@ void CustomObject::ResolveCustomActorCollisionEX(RandoCheckId randoCheckId) {
             fxSparkle_musicNote(sparklePos);
             coMusicPlayer_playMusic(COMUSIC_9_NOTE_COLLECTED, 16000);
             break;
-        case ACTOR_25E_SNS_EGG:
-        case ACTOR_25D_ICE_KEY:
+        case RITYPE_SNS_EGG:
+        case RITYPE_SNS_KEY:
             if (Rando::Logic::GetTotalSnsItemsCollected() >= 7) {
                 gcparade_beginFinalParade();
             }
