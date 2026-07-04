@@ -118,17 +118,18 @@ inline bool ShouldSpawnJinjoJiggy(int16_t levelId) {
     bool shouldSpawn = false;
     int16_t jinjoCount = 0;
 
-    for (auto& pool : Rando::Logic::shuffledPool) {
-        if (!pool.obtained) {
+    for (auto& location : Rando::Logic::shuffledPool) {
+        if (!location.obtained) {
             continue;
         }
 
-        if (Rando::StaticData::Checks[pool.shuffledCheckId].worldId != levelId) {
+        Rando::StaticData::RandoStaticItem randoItem = Rando::StaticData::Items[location.randoItemId];
+
+        if (randoItem.worldId != levelId) {
             continue;
         }
 
-        actor_e actorId = Rando::StaticData::GetActorIdByRandoItemId(pool.randoItemId);
-        if (actorId >= ACTOR_5E_JINJO_YELLOW && actorId <= ACTOR_62_JINJO_GREEN) {
+        if (randoItem.actorId >= ACTOR_5E_JINJO_YELLOW && randoItem.actorId <= ACTOR_62_JINJO_GREEN) {
             jinjoCount++;
         }
     }
@@ -210,12 +211,13 @@ inline bool CanCollectWorldJinjos(level_e levelId) {
     int32_t accessibleJinjos = 0;
 
     for (auto& entry : Rando::Logic::shuffledPool) {
-        if (Rando::StaticData::Checks[entry.shuffledCheckId].worldId != levelId) {
+        Rando::StaticData::RandoStaticItem randoItem = Rando::StaticData::Items[entry.randoItemId];
+
+        if (randoItem.worldId != levelId) {
             continue;
         }
-        actor_e actorId = Rando::StaticData::GetActorIdByRandoItemId(entry.randoItemId);
-        if (actorId >= ACTOR_5E_JINJO_YELLOW && actorId <= ACTOR_62_JINJO_GREEN) {
-            if (CanAccessCheck(entry.shuffledCheckId)) {
+        if (randoItem.actorId >= ACTOR_5E_JINJO_YELLOW && randoItem.actorId <= ACTOR_62_JINJO_GREEN) {
+            if (CanAccessCheck(entry.randoCheckId)) {
                 accessibleJinjos++;
             }
         }

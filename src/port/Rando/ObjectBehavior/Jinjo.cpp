@@ -18,19 +18,19 @@ void Rando::ObjectBehavior::InitJinjoBehavior() {
     COND_HOOK(OnSetJiggyList, EVENT_PRIORITY_NORMAL, IS_RANDO && OPTION_ENABLED, [](IEvent* event) {
         OnSetJiggyList* ev = (OnSetJiggyList*)event;
 
-        for (auto& pool : Rando::Logic::shuffledPool) {
-            if (!pool.obtained) {
+        for (auto& location : Rando::Logic::shuffledPool) {
+            if (!location.obtained) {
                 continue;
             }
 
-            if (Rando::StaticData::Checks[pool.shuffledCheckId].worldId != ev->levelId) {
+            Rando::StaticData::RandoStaticItem randoItem = Rando::StaticData::Items[location.randoItemId];
+
+            if (randoItem.worldId != ev->levelId) {
                 continue;
             }
 
-            actor_e actorId = Rando::StaticData::GetActorIdByRandoItemId(pool.randoItemId);
-            if (actorId >= ACTOR_5E_JINJO_YELLOW && actorId <= ACTOR_62_JINJO_GREEN) {
-                int32_t jinjoMarkerId =
-                    GetJinjoActorMarkerId((actor_e)Rando::StaticData::Items[pool.randoItemId].actorId);
+            if (randoItem.actorId >= ACTOR_5E_JINJO_YELLOW && randoItem.actorId <= ACTOR_62_JINJO_GREEN) {
+                int32_t jinjoMarkerId = GetJinjoActorMarkerId((actor_e)randoItem.actorId);
                 item_adjustByDiffWithHud(ITEM_12_JINJOS, (1 << ((jinjoMarkerId + 6) & 0x1F)));
             }
         }

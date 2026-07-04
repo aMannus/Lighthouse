@@ -669,7 +669,6 @@ void Archipelago_ParseLocations() {
             .name = Rando::StaticData::Checks[location].name,
             .randoCheckId = location,
             .randoItemId = item,
-            .shuffledCheckId = location,
             .randoCollectionId = location,
             .isShuffled = true,
             .obtained = false,

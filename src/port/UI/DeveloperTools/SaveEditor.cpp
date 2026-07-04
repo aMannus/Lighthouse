@@ -448,8 +448,8 @@ void DrawRandoCheckEditor() {
                     ImGui::TextWrapped(Rando::StaticData::Items[check.randoItemId].name);
                     ImGui::TableNextColumn();
 
-                    if (Rando::StaticData::Checks[check.shuffledCheckId].randoCheckType != RCTYPE_JINJO &&
-                        Rando::StaticData::Checks[check.shuffledCheckId].randoCheckType != RCTYPE_MUSIC_NOTE) {
+                    Rando::StaticData::RandoStaticItem randoItem = Rando::StaticData::Items[check.randoItemId];
+                    if (randoItem.randoItemType != RITYPE_JINJO && randoItem.randoItemType != RITYPE_MUSIC_NOTE) {
                         TableCellCenteredText(std::to_string(check.randoCollectionId).c_str());
                     }
                     ImGui::TableNextColumn();
