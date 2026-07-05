@@ -130,28 +130,28 @@ Actor* CustomObject::SetCustomActorParametersEX(RandoCheckId randoCheckId, Actor
     RandoSaveCheck randoSaveCheck = RANDO_SAVE_CHECKS[randoCheckId];
     customActor->marker->randoCheckId = randoCheckId;
 
-    actor_e actorId = Rando::StaticData::GetActorIdByRandoItemId(randoSaveCheck.randoItemId);
-    switch (actorId) {
-        case ACTOR_47_EMPTY_HONEYCOMB:
+    RandoItemType itemType = Rando::StaticData::Items[randoSaveCheck.randoItemId].randoItemType;
+    switch (itemType) {
+        case RITYPE_EMPTY_HONEYCOMB:
             ActorLocal_EmptyHoneycomb* honeycombLocal;
             honeycombLocal = (ActorLocal_EmptyHoneycomb*)&customActor->local;
             honeycombLocal->uid = (honeycomb_e)Rando::Logic::GetShuffledObject(randoCheckId).randoCollectionId;
             break;
-        case ACTOR_46_JIGGY:
+        case RITYPE_JIGGY:
             ActorLocal_Jiggy* jiggyLocal;
             jiggyLocal = (ActorLocal_Jiggy*)&customActor->local;
             jiggyLocal->index = randoSaveCheck.randoCollectionId;
             break;
-        case ACTOR_2D_MUMBO_TOKEN:
+        case RITYPE_MUMBO_TOKEN:
             ActorLocal_MumboToken* tokenLocal;
             tokenLocal = (ActorLocal_MumboToken*)&customActor->local;
             tokenLocal->uid = (mumbotoken_e)Rando::Logic::GetShuffledObject(randoCheckId).randoCollectionId;
             break;
-        case ACTOR_25E_SNS_EGG:
-        case ACTOR_25D_ICE_KEY:
+        case RITYPE_SNS_EGG:
+        case RITYPE_SNS_KEY:
             customActor->actorTypeSpecificField = randoSaveCheck.randoCollectionId;
             customActor->scale = 0.5f;
-            if (actorId == ACTOR_25D_ICE_KEY) {
+            if (itemType == RITYPE_SNS_KEY) {
                 customActor->position_y += 50.0f;
             }
             break;
