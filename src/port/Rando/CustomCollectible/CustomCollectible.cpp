@@ -1,6 +1,26 @@
 #include "CustomCollectible.h"
 #include "actor.h"
 
+extern "C" {
+Actor* actor_new(s32 position[3], s32 yaw, ActorInfo* actorInfo, u32 flags);
+Actor* actor_draw(ActorMarker* marker, Gfx** gfx, Mtx** mtx, Vtx** vtx);
+Actor* marker_getActor(ActorMarker* thisx);
+void marker_despawn(ActorMarker* marker);
+}
+
+ActorInfo customActorInfo = { MARKER_300_CUSTOM_COLLECTIBLE,
+                              ACTOR_3CD_CUSTOM_COLLECTIBLE,
+                              ASSET_35F_MODEL_JIGGY,
+                              1,
+                              NULL,
+                              CustomCollectible_Update,
+                              NULL,
+                              (Actor*(*)(ActorMarker*, Gfx**, Mtx**, Vtx**)) CustomCollectible_Draw,
+                              0,
+                              0,
+                              0.9f,
+                              0 };
+
 void CustomCollectible_Update(Actor* actor) {
     ActorLocal_CustomCollectible* customLocal = (ActorLocal_CustomCollectible*)&actor->local;
 
@@ -17,19 +37,6 @@ void CustomCollectible_Draw(ActorMarker* marker, Gfx** gdl, Mtx** mptr, Vtx** ar
     actor = actor_draw(actor->marker, gdl, mptr, arg3);
 }
 
-ActorInfo customActorInfo = { MARKER_300_CUSTOM_COLLECTIBLE,
-                              ACTOR_3CD_CUSTOM_COLLECTIBLE,
-                              ASSET_35F_MODEL_JIGGY,
-                              1,
-                              NULL,
-                              CustomCollectible_Update,
-                              NULL,
-                              NULL,
-                              0,
-                              0,
-                              0.9f,
-                              0 };
-
 Actor* CustomCollectible::AttachLocalStruct(int32_t randoItemId, Actor* customCollectible) {
     ActorLocal_CustomCollectible* customLocal = (ActorLocal_CustomCollectible*)&customCollectible->local;
 
@@ -38,7 +45,7 @@ Actor* CustomCollectible::AttachLocalStruct(int32_t randoItemId, Actor* customCo
     return customCollectible;
 }
 
-Actor* CustomCollectible::Spawn(int32_t position[3], int32_t flags) {
+Actor* CustomCollectible::Spawn(int32_t position[3], RandoItemId randoItemId) {
     int32_t spawnPosition[3] = { position[0], position[1], position[2] };
 
     int32_t flags = ACTOR_FLAG_UNKNOWN_6 | ACTOR_FLAG_UNKNOWN_7 | ACTOR_FLAG_UNKNOWN_21;

@@ -2,6 +2,7 @@
 #include "port/Rando/Rando.h"
 #include "port/Rando/Logic/Logic.h"
 #include "port/Rando/CustomObject/CustomObject.h"
+#include "port/Rando/CustomCollectible/CustomCollectible.h"
 #include "port/Enhancements/Events/Hooks/Events.h"
 
 #include "port/UI/UIWidgets.hpp"
@@ -399,6 +400,11 @@ void GameplayTools_ObjectSpawner() {
         }
 
         ImGui::EndTable();
+    }
+
+    ImGui::SeparatorText("Custom Collectible Testing");
+    if (UIWidgets::Button("Spawn Custom Collectible", { .color = THEME_COLOR })) {
+        Actor* newActor = CustomCollectible::Spawn(spawnPosition, RI_EMPTY_HONEYCOMB_BUBBLEGLOOP_SWAMP);
     }
 }
 
