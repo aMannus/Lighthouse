@@ -70,6 +70,7 @@ int32_t selectedSnsItem = SNS_ITEM_EGG_YELLOW;
 int32_t selectedJiggy = JIGGY_01_MM_JINJO;
 int32_t selectedHoneycomb = HONEYCOMB_1_MM_HILL;
 int32_t selectedToken = MUMBOTOKEN_01_MM_STUMP_NEAR_CONGA;
+int32_t selectedCustomCollectible = RI_EMPTY_HONEYCOMB_BUBBLEGLOOP_SWAMP;
 
 const char* mapNames[] = {
     "Mumbo's Mountain", "Treasure Trove Cove", "Clanker's Cavern", "Bubblegloop Swamp",   "Freezeezy Peak",
@@ -403,8 +404,23 @@ void GameplayTools_ObjectSpawner() {
     }
 
     ImGui::SeparatorText("Custom Collectible Testing");
-    if (UIWidgets::Button("Spawn Custom Collectible", { .color = THEME_COLOR })) {
-        Actor* newActor = CustomCollectible::Spawn(spawnPosition, RI_EMPTY_HONEYCOMB_BUBBLEGLOOP_SWAMP);
+    if (ImGui::BeginTable("ObjectSpawner", 2, ImGuiTableFlags_SizingStretchSame)) {
+        ImGui::TableNextColumn();
+        if (UIWidgets::Button("Spawn Custom Collectible", { .color = THEME_COLOR })) {
+            Actor* newActor = CustomCollectible::Spawn(spawnPosition, (RandoItemId)selectedCustomCollectible);
+        }
+        ImGui::TableNextColumn();
+        std::string customCollectibleText = Rando::StaticData::Items[(RandoItemId)selectedCustomCollectible].name;
+
+        UIWidgets::SliderInt("##customCollectibleIndex", &selectedCustomCollectible,
+                             UIWidgets::IntSliderOptions()
+                                 .Color(THEME_COLOR)
+                                 .Min(RI_EMPTY_HONEYCOMB_BUBBLEGLOOP_SWAMP)
+                                 .Max(RI_STOP_N_SWOP_ICE_KEY)
+                                 .DefaultValue(RI_EMPTY_HONEYCOMB_BUBBLEGLOOP_SWAMP)
+                                 .Format(customCollectibleText.c_str())
+                                 .LabelPosition(UIWidgets::LabelPositions::None));
+        ImGui::EndTable();
     }
 }
 
