@@ -219,7 +219,7 @@ void GameplayTools_UpdateSnsCheckboxes(StopNSwop_Item selectedSnsId) {
 }
 
 void GameplayTools_SpawnPosition() {
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i <= 2; i++) {
         spawnPosition[i] = playerPosition[i] + spawnOffset[i];
     }
 }
