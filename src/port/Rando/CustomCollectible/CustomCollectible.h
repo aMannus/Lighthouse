@@ -7,7 +7,6 @@ typedef struct {
 } ActorLocal_CustomCollectible;
 
 void CustomCollectible_Update(Actor* actor);
-Actor* CustomCollectible_DrawGeneric(ActorMarker* marker, Gfx** gdl, Mtx** mptr, Vtx** arg3);
 
 class CustomCollectible {
 private:
