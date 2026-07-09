@@ -43,7 +43,7 @@ ActorInfo customActorInfo = { MARKER_300_CUSTOM_COLLECTIBLE,
                               0.9f,
                               0 };
 
-void Update(Actor* actor) {
+void CustomCollectible_Update(Actor* actor) {
     ActorLocal_CustomCollectible* customLocal = (ActorLocal_CustomCollectible*)&actor->local;
 
     if (!actor->initialized) {
@@ -62,10 +62,6 @@ void Update(Actor* actor) {
     actor->yaw += 5.0f;
 }
 
-void CustomCollectible_Update(Actor* actor) {
-    Update(actor);
-}
-
 Actor* CustomCollectible::AttachCustomVariables(int32_t randoItemId, Actor* customCollectible) {
     ActorLocal_CustomCollectible* customLocal = (ActorLocal_CustomCollectible*)&customCollectible->local;
     customLocal->randoItemId = randoItemId;
@@ -79,16 +75,19 @@ Actor* CustomCollectible::Spawn(int32_t position[3], RandoItemId randoItemId) {
     int32_t flags = ACTOR_FLAG_UNKNOWN_6 | ACTOR_FLAG_UNKNOWN_7 | ACTOR_FLAG_UNKNOWN_21;
 
     // Custom models exported for OoT are centered instead of offset to the marker, so they appear underground otherwise
-    actor_e actorId = (actor_e)Rando::StaticData::Items.find(randoItemId)->second.actorId;
-    auto drawInfo = customCollectibleDrawInfo.find(actorId);
-    if (drawInfo->second.drawType == CCT_CUSTOM_MODEL) {
-        position[1] += 50;
+    actor_e actorId = (actor_e)Rando::StaticData::Items[randoItemId].actorId;
+    auto drawInfo = customCollectibleDrawInfo[actorId];
+    if (drawInfo.drawType == CCT_CUSTOM_MODEL) {
+        spawnPosition[1] += 50;
     }
 
-    ActorInfo collectibleInfo = CustomCollectible::GetActorAndDrawInfo(randoItemId);
+    // actor_new stores the ActorInfo* permanently, so it must outlive Spawn()
+    static std::unordered_map<RandoItemId, ActorInfo> sActorInfoCache;
+    ActorInfo& collectibleInfo = sActorInfoCache[randoItemId];
+    collectibleInfo = CustomCollectible::GetActorAndDrawInfo(randoItemId);
 
-    Actor* customCollectible = actor_new(position, 0, &collectibleInfo, flags);
-    if (Rando::StaticData::Items.find(randoItemId)->second.randoItemType == RITYPE_SNS_EGG) {
+    Actor* customCollectible = actor_new(spawnPosition, 0, &collectibleInfo, flags);
+    if (Rando::StaticData::Items[randoItemId].randoItemType == RITYPE_SNS_EGG) {
         customCollectible->actorTypeSpecificField = CustomCollectible::GetSNSEggColor(randoItemId);
     }
     customCollectible->marker->collisionFunc = CustomCollectible::OnCollect;
@@ -119,12 +118,12 @@ uint32_t CustomCollectible::GetSNSEggColor(RandoItemId randoItemId) {
 ActorInfo CustomCollectible::GetActorAndDrawInfo(RandoItemId randoItemId) {
     ActorInfo collectibleInfo = customActorInfo;
 
-    actor_e actorId = (actor_e)Rando::StaticData::Items.find(randoItemId)->second.actorId;
-    auto drawInfo = customCollectibleDrawInfo.find(actorId);
+    actor_e actorId = (actor_e)Rando::StaticData::Items[randoItemId].actorId;
+    auto drawInfo = customCollectibleDrawInfo[actorId];
 
-    collectibleInfo.modelId = drawInfo->second.drawModel;
+    collectibleInfo.modelId = drawInfo.drawModel;
 
-    switch (drawInfo->second.drawType) { 
+    switch (drawInfo.drawType) { 
         case CCT_VANILLA_MODEL:
             collectibleInfo.draw_func = actor_draw;
             break;
