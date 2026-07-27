@@ -435,8 +435,8 @@ void GameplayTools_ObjectSpawner() {
         UIWidgets::SliderInt("##customCollectibleIndex", &selectedCustomCollectible,
                              UIWidgets::IntSliderOptions()
                                  .Color(THEME_COLOR)
-                                 .Min(RI_EMPTY_HONEYCOMB_BUBBLEGLOOP_SWAMP)
-                                 .Max(RI_STOP_N_SWOP_ICE_KEY)
+                                 .Min(RI_UNKNOWN + 1)
+                                 .Max(RI_MAX - 1)
                                  .DefaultValue(RI_EMPTY_HONEYCOMB_BUBBLEGLOOP_SWAMP)
                                  .Format(customCollectibleText.c_str())
                                  .LabelPosition(UIWidgets::LabelPositions::None));

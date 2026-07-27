@@ -71,7 +71,7 @@ Actor* CustomCollectible_DrawCustomModel(ActorMarker* marker, Gfx** gfx, Mtx** m
     CustomItemModel model;
     
     switch (customLocal->randoItemId) { 
-        case RI_STOP_N_SWOP_ICE_KEY:
+        case RI_AP_ITEM_PROGRESSION:
             model = ARCHIPELAGO_MODEL_PROGRESSIVE;
             break;
         default:
