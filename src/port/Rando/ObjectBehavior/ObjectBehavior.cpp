@@ -31,7 +31,10 @@ std::vector<int32_t> actorSpawnWhitelist = {
     ACTOR_2D_MUMBO_TOKEN,
     ACTOR_46_JIGGY,
     ACTOR_47_EMPTY_HONEYCOMB,
+    ACTOR_49_EXTRA_LIFE,
+    ACTOR_50_HONEYCOMB,
     ACTOR_51_MUSIC_NOTE,
+    ACTOR_52_BLUE_EGG,
     ACTOR_5E_JINJO_YELLOW,
     ACTOR_5F_JINJO_ORANGE,
     ACTOR_60_JINJO_BLUE,
@@ -44,7 +47,10 @@ std::vector<int32_t> actorSpawnWhitelist = {
 
 std::map<actor_e, UIWidgets::Colors> randoItemColors = {
     { ACTOR_1_UNKNOWN,          UIWidgets::Colors::Brown },
+    { ACTOR_52_BLUE_EGG,        UIWidgets::Colors::Cyan },
     { ACTOR_47_EMPTY_HONEYCOMB, UIWidgets::Colors::Yellow },
+    { ACTOR_49_EXTRA_LIFE,      UIWidgets::Colors::Yellow },
+    { ACTOR_50_HONEYCOMB,       UIWidgets::Colors::Yellow },
     { ACTOR_46_JIGGY,           UIWidgets::Colors::Yellow },
     { ACTOR_60_JINJO_BLUE,      UIWidgets::Colors::SkyBlue },
     { ACTOR_62_JINJO_GREEN,     UIWidgets::Colors::Green },
@@ -254,6 +260,10 @@ void Rando::ObjectBehavior::Init() {
         CustomObject::FlushRandoSpawnQueue();
         DespawnCollectedBundles();
 
+        if (ev->actorId == ACTOR_12_BEEHIVE) {
+            SPDLOG_INFO("Actor ID: {} {}, {}, {}", ev->actorId, ev->posX, ev->posY, ev->posZ);
+        }
+
         if (currentMap == MAP_12_GV_GOBIS_VALLEY) {
             if (ev->actorId == ACTOR_118_GRABBA) {
                 event->Cancelled = RANDO_SAVE_CHECKS[RC_GV_JIGGY_GRABBA].obtained;
@@ -374,6 +384,11 @@ void Rando::ObjectBehavior::Init() {
                         randoItemId = randoSaveCheck.randoItemId;
                     }
                     break;
+                case MARKER_55_HONEYCOMB:
+                    if (RANDO_SAVE_OPTIONS[RO_SHUFFLE_BEEHIVE_HONEYCOMBS].optionValue == RO_GENERIC_ON) {
+                        randoItemId = randoSaveCheck.randoItemId;
+                    }
+                    break;
                 case MARKER_5A_JINJO_BLUE:
                 case MARKER_5B_JINJO_GREEN:
                 case MARKER_5C_JINJO_ORANGE:
@@ -387,6 +402,16 @@ void Rando::ObjectBehavior::Init() {
                     if (RANDO_SAVE_OPTIONS[RO_SHUFFLE_MUSIC_NOTES].optionValue == RO_GENERIC_ON) {
                         randoItemId = randoSaveCheck.randoItemId;
                         event->Cancelled = true;
+                    }
+                    break;
+                case MARKER_60_BLUE_EGG_COLLECTIBLE:
+                    if (RANDO_SAVE_OPTIONS[RO_SHUFFLE_BLUE_EGGS].optionValue == RO_GENERIC_ON) {
+                        randoItemId = randoSaveCheck.randoItemId;
+                    }
+                    break;
+                case MARKER_61_EXTRA_LIFE:
+                    if (RANDO_SAVE_OPTIONS[RO_SHUFFLE_EXTRA_LIVES].optionValue == RO_GENERIC_ON) {
+                        randoItemId = randoSaveCheck.randoItemId;
                     }
                     break;
                 case MARKER_168_ICE_KEY:
