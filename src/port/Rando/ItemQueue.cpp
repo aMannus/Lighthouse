@@ -18,6 +18,10 @@ extern struct {
     u8 D_803832C0[0xD];
     u8 D_803832CD[0xD];
 } jiggyscore;
+#define MUMBO_TOKEN_COUNT 126
+#define MUMBOSCORE_SIZE (((MUMBO_TOKEN_COUNT - 1 + 7) & ~7) / 8)
+u8 sMumboTokenScore[MUMBOSCORE_SIZE];
+extern u8 D_80385FF0[0xE];
 }
 
 #define CVAR_NAME_SHOW_COLLISION_NOTIFICATIONS "gRandoSettings.RandoNotifications"
@@ -114,10 +118,82 @@ void ItemQueue::GiveItem(RandoItemId randoItemId) {
         case RITYPE_JINJO:
             break;
         case RITYPE_MOLEHILL:
+            coMusicPlayer_playMusic(COMUSIC_D_JINGLE_JIGGY_COLLECTED, -1);
+            switch (randoItemId) {
+                case RI_MOLEHILL_BARGE:
+                    ability_unlock(ABILITY_0_BARGE);
+                    break;
+                case RI_MOLEHILL_BEAK_BOMB:
+                    ability_unlock(ABILITY_1_BEAK_BOMB);
+                    break;
+                case RI_MOLEHILL_BEAK_BUSTER:
+                    ability_unlock(ABILITY_2_BEAK_BUSTER);
+                    break;
+                case RI_MOLEHILL_CAMERA_CONTROL:
+                    ability_unlock(ABILITY_3_CAMERA_CONTROL);
+                    break;
+                case RI_MOLEHILL_CLAW_SWIPE:
+                    ability_unlock(ABILITY_4_CLAW_SWIPE);
+                    ability_unlock(ABILITY_C_ROLL);
+                    ability_unlock(ABILITY_B_RATATAT_RAP);
+                    break;
+                case RI_MOLEHILL_CLIMB:
+                    ability_unlock(ABILITY_5_CLIMB);
+                    break;
+                case RI_MOLEHILL_DIVE:
+                    ability_unlock(ABILITY_F_DIVE);
+                    break;
+                case RI_MOLEHILL_EGGS:
+                    ability_unlock(ABILITY_6_EGGS);
+                    item_adjustByDiffWithHud(ITEM_D_EGGS, 50);
+                    break;
+                case RI_MOLEHILL_FLAP_FLIP:
+                    ability_unlock(ABILITY_A_HOLD_A_JUMP_HIGHER);
+                    ability_unlock(ABILITY_7_FEATHERY_FLAP);
+                    ability_unlock(ABILITY_8_FLAP_FLIP);
+                    break;
+                case RI_MOLEHILL_FLIGHT:
+                    ability_unlock(ABILITY_9_FLIGHT);
+                    item_adjustByDiffWithHud(ITEM_F_RED_FEATHER, 25);
+                    break;
+                case RI_MOLEHILL_SHOCK_JUMP:
+                    ability_unlock(ABILITY_D_SHOCK_JUMP);
+                    break;
+                case RI_MOLEHILL_TALON_TROT:
+                    ability_unlock(ABILITY_10_TALON_TROT);
+                    break;
+                case RI_MOLEHILL_TURBO_TALON:
+                    ability_unlock(ABILITY_11_TURBO_TALON);
+                    break;
+                case RI_MOLEHILL_WADING_BOOTS:
+                    ability_unlock(ABILITY_E_WADING_BOOTS);
+                    break;
+                case RI_MOLEHILL_WONDERWING:
+                    ability_unlock(ABILITY_12_WONDERWING);
+                    item_adjustByDiffWithHud(ITEM_10_GOLD_FEATHER, 5);
+                    break;
+                default:
+                    break;
+            }
             break;
         case RITYPE_MUMBO_TOKEN:
+            func_8030E760((sfx_e)0x401, 1.0f, 0x7fff);
+            for (uint32_t i = MUMBOTOKEN_01_MM_STUMP_NEAR_CONGA;
+                i <= MUMBOTOKEN_73_CCW_WINTER_SIR_SLUSH_BETWEEN_BIG_FLOWER_AND_MUMBOS_SKULL; i++) {
+                if ((sMumboTokenScore[(i - 1) / 8] & (1 << (i & 7))) == 0) {
+                    mumboscore_set((mumbotoken_e)i, true);
+                    break;
+                }
+            }
+            item_inc(ITEM_1C_MUMBO_TOKEN);
             break;
         case RITYPE_MUSIC_NOTE:
+            coMusicPlayer_playMusic(COMUSIC_9_NOTE_COLLECTED, 16000);
+            D_80385FF0[worldId]++;
+            if (worldId == map_getLevel(gsworld_getMap())) {
+                item_set(ITEM_C_NOTE, D_80385FF0[map_getLevel(gsworld_getMap())]);
+            }
+            // TODO: Add note data to savefile
             break;
         case RITYPE_SNS_EGG:
             break;

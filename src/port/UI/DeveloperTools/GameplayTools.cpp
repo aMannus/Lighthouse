@@ -430,7 +430,8 @@ void GameplayTools_ObjectSpawner() {
             Actor* newActor = CustomCollectible::Spawn(spawnPosition, (RandoCheckId)selectedCustomCollectible);
         }
         ImGui::TableNextColumn();
-        std::string customCollectibleText = Rando::StaticData::Checks[(RandoCheckId)selectedCustomCollectible].name;
+        std::string customCollectibleText = std::to_string(selectedCustomCollectible) + ": " +
+                                            Rando::StaticData::Checks[(RandoCheckId)selectedCustomCollectible].name;
 
         UIWidgets::SliderInt("##customCollectibleIndex", &selectedCustomCollectible,
                              UIWidgets::IntSliderOptions()
