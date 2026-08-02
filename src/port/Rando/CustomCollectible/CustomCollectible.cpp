@@ -1,25 +1,35 @@
 #include "CustomCollectible.h"
 #include "CustomCollectibleDrawCustom.h"
 #include <unordered_map>
-#include "port/Rando/Rando.h"
-#include <print>
+
+#include <libultraship/bridge.h>
 
 extern "C" {
-#include "core1/sns.h"
-Actor* actor_new(s32 position[3], s32 yaw, ActorInfo* actorInfo, u32 flags);
-Actor* actor_draw(ActorMarker* marker, Gfx** gfx, Mtx** mtx, Vtx** vtx);
-Actor* fxTouchSparkle_draw(ActorMarker* marker, Gfx** gfx, Mtx** mtx, Vtx** vtx);
-Actor* marker_getActor(ActorMarker* thisx);
-void marker_despawn(ActorMarker* marker);
-
+#include "functions.h"
+#include "actor.h"
+void __chJinjo_802CDC9C(Actor* thisx, s16 arg1);
 Actor* func_802D94B4(ActorMarker* marker, Gfx** gfx, Mtx** mtx, Vtx** vtx);
-void func_8028E964(f32 pos[3]);
-int func_80257F18(f32 src[3], f32 target[3], f32* yaw);
-bool func_8028AED4(f32 arg0[3], f32 arg1);
-void coMusicPlayer_playMusic(enum comusic_e track_id, s32 volume);
-void __chJinjo_802CDC9C(Actor* actor, s16 arg1);
-void fxSparkle_honeycomb(s16 position[3]);
+Actor* func_802D41C4(ActorMarker* marker, Gfx** gfx, Mtx** mtx, Vtx** vtx);
 }
+
+std::unordered_map<actor_e, CustomCollectibleDrawInfo> customCollectibleDrawInfo = {
+    { ACTOR_52_BLUE_EGG, { ASSET_36D_SPRITE_BLUE_EGG, CCT_VANILLA_SPRITE } },
+    { ACTOR_47_EMPTY_HONEYCOMB, { ASSET_361_MODEL_EMPTY_HONEYCOMB, CCT_VANILLA_MODEL } },
+    { ACTOR_49_EXTRA_LIFE, { ASSET_36E_MODEL_EXTRA_LIFE, CCT_VANILLA_SPRITE } },
+    { ACTOR_50_HONEYCOMB, { ASSET_363_MODEL_HONEYCOMB, CCT_VANILLA_MODEL } },
+    { ACTOR_46_JIGGY, { ASSET_35F_MODEL_JIGGY, CCT_VANILLA_MODEL } },
+    { ACTOR_60_JINJO_BLUE, { ASSET_3C0_MODEL_JINJO_BLUE, CCT_JINJO } },
+    { ACTOR_62_JINJO_GREEN, { ASSET_3C2_MODEL_JINJO_GREEN, CCT_JINJO } },
+    { ACTOR_5F_JINJO_ORANGE, { ASSET_3BC_MODEL_JINJO_ORANGE, CCT_JINJO } },
+    { ACTOR_61_JINJO_PINK, { ASSET_3C1_MODEL_JINJO_PINK, CCT_JINJO } },
+    { ACTOR_5E_JINJO_YELLOW, { ASSET_3BB_MODEL_JINJO_YELLOW, CCT_JINJO } },
+    { ACTOR_12C_MOLEHILL, { ASSET_387_MODEL_BOTTLES, CCT_MOLEHILL } },
+    { ACTOR_2D_MUMBO_TOKEN, { ASSET_41A_SPRITE_MUMBO_TOKEN, CCT_VANILLA_SPRITE } },
+    { ACTOR_51_MUSIC_NOTE, { ASSET_6D6_SPRITE_MUSIC_NOTE, CCT_VANILLA_SPRITE } },
+    { ACTOR_25E_SNS_EGG, { ASSET_50D_MODEL_SNS_EGG, CCT_VANILLA_SNS_EGG } },
+    { ACTOR_25D_ICE_KEY, { ASSET_50C_MODEL_ICE_KEY, CCT_VANILLA_MODEL } },
+    { ACTOR_3CD_CUSTOM_COLLECTIBLE, { ASSET_0_NONE, CCT_CUSTOM_MODEL } },
+};
 
 ActorAnimationInfo moleAnimations[] = {
     { 0, 0.0f },
@@ -30,10 +40,22 @@ ActorAnimationInfo moleAnimations[] = {
     { ASSET_13A_ANIM_BOTTLES_ENTER, 2000000000.0f },
 };
 
+ActorAnimationInfo chJinjoAnimations[] = { { 0, 0.0f },
+                                           { ASSET_2D_ANIM_JINJO_IDLE, 1000000.0f },
+                                           { ASSET_2D_ANIM_JINJO_IDLE, 1.5f },
+                                           { ASSET_2F_ANIM_JINJO_HELP, 1.5f },
+                                           { ASSET_31_ANIM_JINJO_JUMP, 0.75f },
+                                           { ASSET_2D_ANIM_JINJO_IDLE, 1000000.0f },
+                                           { ASSET_31_ANIM_JINJO_JUMP, 0.4f },
+                                           { ASSET_130_ANIM_JINJO_FLY_START, 1.75f },
+                                           { ASSET_131_ANIM_JINJO_FLY_END, 2.13333f },
+                                           { ASSET_31_ANIM_JINJO_JUMP, 0.75f },
+};
+
 ActorInfo customActorInfo = { MARKER_300_CUSTOM_COLLECTIBLE,
                               ACTOR_3CD_CUSTOM_COLLECTIBLE,
-                              ASSET_387_MODEL_BOTTLES,
-                              3,
+                              ASSET_0_NONE,
+                              1,
                               NULL,
                               CustomCollectible_Update,
                               NULL,
@@ -49,10 +71,15 @@ void CustomCollectible_Update(Actor* actor) {
     if (!actor->initialized) {
         actor->initialized = true;
         actor->marker->collidable = true;
+
+        if (customLocal->itemType == RITYPE_MUSIC_NOTE) {
+            actor->scale = 0.4f;
+        } else if (customLocal->itemType == RITYPE_SNS_EGG) {
+            actor->scale = 0.4f;
+        }
     }
 
-    RandoItemType itemType = Rando::StaticData::Items[(RandoItemId)customLocal->randoItemId].randoItemType;
-    if (itemType == RITYPE_MOLEHILL) {
+    if (customLocal->itemType == RITYPE_MOLEHILL || customLocal->itemType == RITYPE_JINJO) {
         CustomCollectible::FacePlayer(actor);
     } else {
         actor->yaw += 5.0f;
@@ -73,21 +100,28 @@ void CustomCollectible::FacePlayer(Actor* actor) {
     __chJinjo_802CDC9C(actor, sp66);
 }
 
-Actor* CustomCollectible::AttachCustomVariables(int32_t randoItemId, Actor* customCollectible) {
+Actor* CustomCollectible::AttachCustomVariables(RandoCheckId randoCheckId, Actor* customCollectible) {
     ActorLocal_CustomCollectible* customLocal = (ActorLocal_CustomCollectible*)&customCollectible->local;
+
+    RandoItemId randoItemId = RANDO_SAVE_CHECKS[randoCheckId].randoItemId;
+
+    customLocal->randoCheckId = randoCheckId;
     customLocal->randoItemId = randoItemId;
+    customLocal->actorId = (actor_e)Rando::StaticData::Items[randoItemId].actorId;
+    customLocal->itemType = Rando::StaticData::Items[randoItemId].randoItemType;
 
     return customCollectible;
 }
 
-Actor* CustomCollectible::Spawn(int32_t position[3], RandoItemId randoItemId) {
+Actor* CustomCollectible::Spawn(int32_t position[3], RandoCheckId randoCheckId) {
     int32_t spawnPosition[3] = { position[0], position[1], position[2] };
 
     int32_t flags = ACTOR_FLAG_UNKNOWN_6 | ACTOR_FLAG_UNKNOWN_7 | ACTOR_FLAG_UNKNOWN_21;
 
-    // Custom models exported for OoT are centered instead of offset to the marker, so they appear underground otherwise
-    actor_e actorId = (actor_e)Rando::StaticData::Items[randoItemId].actorId;
+    RandoItemId randoItemId = RANDO_SAVE_CHECKS[randoCheckId].randoItemId;
     RandoItemType itemType = Rando::StaticData::Items[randoItemId].randoItemType;
+
+    // Custom models exported for OoT are centered instead of offset to the marker, so they appear underground otherwise
     if (itemType == RITYPE_AP_ITEM) {
         spawnPosition[1] += 50;
     }
@@ -99,36 +133,75 @@ Actor* CustomCollectible::Spawn(int32_t position[3], RandoItemId randoItemId) {
 
     // Spawn actor
     Actor* customCollectible = actor_new(spawnPosition, 0, &collectibleInfo, flags);
+    if (itemType == RITYPE_SNS_EGG) {
+        customCollectible->actorTypeSpecificField = CustomCollectible::GetSNSEggColor(randoItemId);
+    }
     customCollectible->marker->collisionFunc = CustomCollectible::OnCollect;
-    customCollectible = CustomCollectible::AttachCustomVariables(randoItemId, customCollectible);
+    customCollectible = CustomCollectible::AttachCustomVariables(randoCheckId, customCollectible);
 
     return customCollectible;
+}
+
+uint32_t CustomCollectible::GetSNSEggColor(RandoItemId randoItemId) {
+    switch (randoItemId) {
+        case RI_STOP_N_SWOP_EGG_BLUE:
+            return (uint32_t)SNS_ITEM_EGG_BLUE;
+        case RI_STOP_N_SWOP_EGG_CYAN:
+            return (uint32_t)SNS_ITEM_EGG_CYAN;
+        case RI_STOP_N_SWOP_EGG_GREEN:
+            return (uint32_t)SNS_ITEM_EGG_GREEN;
+        case RI_STOP_N_SWOP_EGG_PINK:
+            return (uint32_t)SNS_ITEM_EGG_PINK;
+        case RI_STOP_N_SWOP_EGG_RED:
+            return (uint32_t)SNS_ITEM_EGG_RED;
+        case RI_STOP_N_SWOP_EGG_YELLOW:
+            return (uint32_t)SNS_ITEM_EGG_YELLOW;
+        default:
+            return (uint32_t)SNS_ITEM_EGG_CYAN;
+    }
 }
 
 ActorInfo CustomCollectible::GetActorAndDrawInfo(RandoItemId randoItemId) {
     ActorInfo collectibleInfo = customActorInfo;
 
     actor_e actorId = (actor_e)Rando::StaticData::Items[randoItemId].actorId;
-    RandoItemType itemType = Rando::StaticData::Items[randoItemId].randoItemType;
+    auto drawInfo = customCollectibleDrawInfo[actorId];
 
-    switch (itemType) {
-        case RITYPE_MOLEHILL:
-            collectibleInfo.draw_func = func_802D94B4;
-            collectibleInfo.modelId = ASSET_387_MODEL_BOTTLES;
-            collectibleInfo.animations = moleAnimations;
+    collectibleInfo.modelId = drawInfo.drawModel;
+
+    switch (drawInfo.drawType) {
+        case CCT_VANILLA_MODEL:
+            collectibleInfo.draw_func = actor_draw;
             break;
-        case RITYPE_AP_ITEM:
+        case CCT_VANILLA_SPRITE:
+            collectibleInfo.draw_func = fxTouchSparkle_draw;
+            break;
+        case CCT_JINJO:
+            collectibleInfo.draw_func = actor_draw;
+            collectibleInfo.animations = chJinjoAnimations;
+            collectibleInfo.startAnimation = 3;
+            break;
+        case CCT_MOLEHILL:
+            collectibleInfo.draw_func = func_802D94B4;
+            collectibleInfo.animations = moleAnimations;
+            collectibleInfo.startAnimation = 3;
+            break;
+        case CCT_VANILLA_SNS_EGG:
+            collectibleInfo.draw_func = func_802D41C4;
+            break;
+        case CCT_CUSTOM_MODEL:
             collectibleInfo.draw_func = CustomCollectible_DrawCustomModel;
             break;
         default:
             break;
     }
-
     return collectibleInfo;
 }
 
 void CustomCollectible::OnCollect(struct actorMarker_s* self, struct actorMarker_s* other) {
+    Actor* actor = marker_getActor(self);
+    ActorLocal_CustomCollectible* customLocal = (ActorLocal_CustomCollectible*)&actor->local;
     fxSparkle_honeycomb(&self->propPtr->x);
-    coMusicPlayer_playMusic(COMUSIC_9_NOTE_COLLECTED, 16000);
+    ItemQueue::AddCheck(customLocal->randoCheckId);
     marker_despawn(self);
 }

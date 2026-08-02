@@ -441,6 +441,7 @@ void gameSelect_update(Actor *this){
                         chBottlesBonus_resetCompleted();
                         gameFile_load(gSelectedGameNum);
                         port_syncBottlesBonusIndex();
+                        CALL_EVENT(OnGameStart);
                         if(!gameFile_isNotEmpty(sp84)){
                             s32 skipIntro = 0;
                             CALL_EVENT(OnNewGame, &skipIntro);

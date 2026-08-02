@@ -4,8 +4,6 @@
 #include <libultra/gbi.h>
 #include <libultraship/libultra/types.h>
 
-#include "actor.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

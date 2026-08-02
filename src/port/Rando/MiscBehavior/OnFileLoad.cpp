@@ -1,5 +1,6 @@
 #include "MiscBehavior.h"
 #include <libultraship/bridge/consolevariablebridge.h>
+#include "src/port/ShipInit.hpp"
 #include "port/Enhancements/Events/Hooks/Events.h"
 #include "port/UI/Notification.h"
 
@@ -20,6 +21,8 @@ void Rando::MiscBehavior::OnFileLoad() {
         selectedFileNum = ev->fileNum;
         Rando::Logic::shuffledPool.clear();
     });
+
+    REGISTER_LISTENER(OnGameStart, EVENT_PRIORITY_NORMAL, [](IEvent* event) { ShipInit::Init("IS_RANDO"); });
 
     REGISTER_LISTENER(OnSaveLoad, EVENT_PRIORITY_NORMAL, [](IEvent* event) {
         OnSaveLoad* ev = (OnSaveLoad*)event;

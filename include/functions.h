@@ -3492,4 +3492,7 @@ void _guMtxIdentF_80245D44(float mf[4][4]); //static should NOT be here
 void func_80241304(Mtx *m, float x, float y, float z);
 BKModelBin *  marker_loadModelBin(ActorMarker *marker);
 
+// --- port/TooieJiggyDance.cpp
+void spawnOrbit();
+
 #endif // FUNCTIONS_H
