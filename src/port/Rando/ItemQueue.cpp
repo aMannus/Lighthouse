@@ -22,6 +22,12 @@ extern struct {
 #define MUMBOSCORE_SIZE (((MUMBO_TOKEN_COUNT - 1 + 7) & ~7) / 8)
 u8 sMumboTokenScore[MUMBOSCORE_SIZE];
 extern u8 D_80385FF0[0xE];
+
+extern ActorInfo chJinjoBlue;
+extern ActorInfo chJinjoGreen;
+extern ActorInfo chJinjoYellow;
+extern ActorInfo chJinjoPink;
+extern ActorInfo chJinjoOrange;
 }
 
 #define CVAR_NAME_SHOW_COLLISION_NOTIFICATIONS "gRandoSettings.RandoNotifications"
@@ -67,10 +73,14 @@ void ItemQueue::Process() {
 
 void ItemQueue::GiveItem(RandoItemId randoItemId) {
     RandoItemType itemType = Rando::StaticData::Items[randoItemId].randoItemType;
+    actor_e actorId = (actor_e)Rando::StaticData::Items[randoItemId].actorId;
     int16_t worldId = Rando::StaticData::Items[randoItemId].worldId;
     uint16_t combId;
     uint16_t maxHoneycombs;
     uint32_t jiggyId;
+    ActorInfo* actorInfo;
+    int32_t playerPosition[3];
+    Actor* customActor;
 
     switch (itemType) {
         case RITYPE_BLUE_EGG:
@@ -116,6 +126,25 @@ void ItemQueue::GiveItem(RandoItemId randoItemId) {
             spawnOrbit();
             break;
         case RITYPE_JINJO:
+            switch (actorId) { 
+            case ACTOR_5E_JINJO_YELLOW:
+                actorInfo = &chJinjoBlue;
+                break;
+            case ACTOR_5F_JINJO_ORANGE:
+                actorInfo = &chJinjoBlue;
+                break;
+            case ACTOR_60_JINJO_BLUE:
+                actorInfo = &chJinjoBlue;
+                break;
+            case ACTOR_61_JINJO_PINK:
+                actorInfo = &chJinjoBlue;
+                break;
+            case ACTOR_62_JINJO_GREEN:
+                actorInfo = &chJinjoBlue;
+                break;
+            }
+            player_getPosition_s32(playerPosition);
+            customActor = actor_new(playerPosition, 0, actorInfo, ACTOR_FLAG_UNKNOWN_6 | ACTOR_FLAG_UNKNOWN_8);
             break;
         case RITYPE_MOLEHILL:
             coMusicPlayer_playMusic(COMUSIC_D_JINGLE_JIGGY_COLLECTED, -1);
