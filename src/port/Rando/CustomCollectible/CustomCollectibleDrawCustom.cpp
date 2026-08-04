@@ -39,7 +39,7 @@ static const char* sCustomModelPaths[] = {
 
 // The models are authored at OoT world scale, which is roughly 10x too large
 // for BK. Baked into every draw so callers treat scale 1.0 as "natural size".
-static const f32 sCustomModelBaseScale = 0.05f;
+static const f32 sCustomModelBaseScale = 0.04f;
 
 // BK never uploads RSP lights (its models bake shading into vertex colors), but
 // these materials enable G_LIGHTING, so without our own light setup the shade
@@ -92,9 +92,10 @@ Actor* CustomCollectible_DrawCustomModel(ActorMarker* marker, Gfx** gfx, Mtx** m
     // scopes instead.
     FrameInterpolation_RecordOpenChild("custom_item", (uintptr_t)model);
     f32 rotation[3] = { actor->pitch, actor->yaw, actor->roll };
+    f32 position[3] = { actor->position[0], actor->position[1] + 50, actor->position[2] };
     // The modelview translation is camera-relative, matching modelRender_draw.
     mlMtxIdent();
-    func_80252AF0(camera_position, actor->position, rotation, actor->scale * sCustomModelBaseScale, NULL);
+    func_80252AF0(camera_position, position, rotation, actor->scale * sCustomModelBaseScale, NULL);
     mlMtxApply(*mtx);
     gSPMatrix((*gfx)++, (*mtx)++, G_MTX_PUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
     gSPSetLights1((*gfx)++, sCustomModelLights);

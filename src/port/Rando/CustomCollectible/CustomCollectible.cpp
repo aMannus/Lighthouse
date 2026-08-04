@@ -28,7 +28,7 @@ std::unordered_map<actor_e, CustomCollectibleDrawInfo> customCollectibleDrawInfo
     { ACTOR_51_MUSIC_NOTE, { ASSET_6D6_SPRITE_MUSIC_NOTE, CCT_GENERIC_SPRITE } },
     { ACTOR_25E_SNS_EGG, { ASSET_50D_MODEL_SNS_EGG, CCT_VANILLA_SNS_EGG } },
     { ACTOR_25D_ICE_KEY, { ASSET_50C_MODEL_ICE_KEY, CCT_GENERIC_MODEL } },
-    { ACTOR_3CD_CUSTOM_COLLECTIBLE, { ASSET_0_NONE, CCT_CUSTOM_MODEL } },
+    { ACTOR_3CD_CUSTOM_COLLECTIBLE, { ASSET_35F_MODEL_JIGGY, CCT_CUSTOM_MODEL } },
 };
 
 ActorAnimationInfo moleAnimations[] = {
@@ -90,6 +90,12 @@ void CustomCollectible_Update(Actor* actor) {
             }
         }
     }
+
+    // Allows shadows
+    if (customLocal->itemType == RITYPE_AP_ITEM) {
+        actor->unk124_6 = 1;
+        actor->marker->unk14_21 = 1;
+    }
 }
 
 f32 CustomCollectible::GetScale(RandoItemType itemType) {
@@ -137,12 +143,8 @@ Actor* CustomCollectible::Spawn(int32_t position[3], RandoCheckId randoCheckId) 
     int32_t flags = ACTOR_FLAG_UNKNOWN_6 | ACTOR_FLAG_UNKNOWN_7 | ACTOR_FLAG_UNKNOWN_21;
 
     RandoItemId randoItemId = RANDO_SAVE_CHECKS[randoCheckId].randoItemId;
+    randoItemId = RI_AP_ITEM_PROGRESSION;
     RandoItemType itemType = Rando::StaticData::Items[randoItemId].randoItemType;
-
-    // Custom models exported for OoT are centered instead of offset to the marker, so they appear underground otherwise
-    if (itemType == RITYPE_AP_ITEM) {
-        spawnPosition[1] += 50;
-    }
 
     // actor_new stores the ActorInfo* permanently, so it must outlive Spawn()
     static std::unordered_map<RandoItemId, ActorInfo> sActorInfoCache;

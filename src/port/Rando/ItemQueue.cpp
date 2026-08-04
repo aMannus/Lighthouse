@@ -222,11 +222,34 @@ void ItemQueue::GiveItem(RandoItemId randoItemId) {
             if (worldId == map_getLevel(gsworld_getMap())) {
                 item_set(ITEM_C_NOTE, D_80385FF0[map_getLevel(gsworld_getMap())]);
             }
-            // TODO: Add note data to savefile
             break;
         case RITYPE_SNS_EGG:
+            comusic_playTrack(COMUSIC_88_BIG_SNS_FANFARE);
+            FUNC_8030E624(SFX_114_BRICKWALL_BREAKING, 0.8f, 15000);
+            switch (randoItemId) {
+                case RI_STOP_N_SWOP_EGG_BLUE:
+                    sns_set_item_and_update_payload(SNS_ITEM_EGG_BLUE, 0, 1);
+                    break;
+                case RI_STOP_N_SWOP_EGG_CYAN:
+                    sns_set_item_and_update_payload(SNS_ITEM_EGG_CYAN, 0, 1);
+                    break;
+                case RI_STOP_N_SWOP_EGG_GREEN:
+                    sns_set_item_and_update_payload(SNS_ITEM_EGG_GREEN, 0, 1);
+                    break;
+                case RI_STOP_N_SWOP_EGG_PINK:
+                    sns_set_item_and_update_payload(SNS_ITEM_EGG_PINK, 0, 1);
+                    break;
+                case RI_STOP_N_SWOP_EGG_RED:
+                    sns_set_item_and_update_payload(SNS_ITEM_EGG_RED, 0, 1);
+                    break;
+                case RI_STOP_N_SWOP_EGG_YELLOW:
+                    sns_set_item_and_update_payload(SNS_ITEM_EGG_YELLOW, 0, 1);
+                    break;
+            }
             break;
         case RITYPE_SNS_KEY:
+            sns_set_item_and_update_payload(SNS_ITEM_ICE_KEY, 0, 1);
+            comusic_playTrack(COMUSIC_88_BIG_SNS_FANFARE);
             break;
         case RITYPE_AP_ITEM:
             break;

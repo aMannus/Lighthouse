@@ -10,6 +10,7 @@
 
 extern "C" {
 void item_inc(enum item_e item);
+extern u8 D_80385FF0[0xE];
 }
 
 #define OPTION_ENABLED RANDO_SAVE_OPTIONS[RO_SHUFFLE_MUSIC_NOTES].optionValue
@@ -17,22 +18,7 @@ void item_inc(enum item_e item);
 void Rando::ObjectBehavior::InitMusicNoteBehavior() {
     COND_HOOK(OnSetJiggyList, EVENT_PRIORITY_NORMAL, IS_RANDO && OPTION_ENABLED, [](IEvent* event) {
         OnSetJiggyList* ev = (OnSetJiggyList*)event;
-        int32_t currentNotes = 0;
 
-        for (auto& location : Rando::Logic::shuffledPool) {
-            Rando::StaticData::RandoStaticItem randoItem = Rando::StaticData::Items[location.randoItemId];
-
-            if (randoItem.worldId != ev->levelId) {
-                continue;
-            }
-
-            if (randoItem.randoItemType == RITYPE_MUSIC_NOTE) {
-                if (location.obtained) {
-                    currentNotes++;
-                }
-            }
-        }
-
-        item_set(ITEM_C_NOTE, currentNotes);
+        item_set(ITEM_C_NOTE, D_80385FF0[ev->levelId]);
     })
 }
