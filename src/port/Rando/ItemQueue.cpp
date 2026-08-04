@@ -127,21 +127,21 @@ void ItemQueue::GiveItem(RandoItemId randoItemId) {
             break;
         case RITYPE_JINJO:
             switch (actorId) { 
-            case ACTOR_5E_JINJO_YELLOW:
-                actorInfo = &chJinjoBlue;
-                break;
-            case ACTOR_5F_JINJO_ORANGE:
-                actorInfo = &chJinjoBlue;
-                break;
-            case ACTOR_60_JINJO_BLUE:
-                actorInfo = &chJinjoBlue;
-                break;
-            case ACTOR_61_JINJO_PINK:
-                actorInfo = &chJinjoBlue;
-                break;
-            case ACTOR_62_JINJO_GREEN:
-                actorInfo = &chJinjoBlue;
-                break;
+                case ACTOR_5E_JINJO_YELLOW:
+                    actorInfo = &chJinjoYellow;
+                    break;
+                case ACTOR_5F_JINJO_ORANGE:
+                    actorInfo = &chJinjoOrange;
+                    break;
+                case ACTOR_60_JINJO_BLUE:
+                    actorInfo = &chJinjoBlue;
+                    break;
+                case ACTOR_61_JINJO_PINK:
+                    actorInfo = &chJinjoPink;
+                    break;
+                case ACTOR_62_JINJO_GREEN:
+                    actorInfo = &chJinjoGreen;
+                    break;
             }
             player_getPosition_s32(playerPosition);
             customActor = actor_new(playerPosition, 0, actorInfo, ACTOR_FLAG_UNKNOWN_6 | ACTOR_FLAG_UNKNOWN_8);

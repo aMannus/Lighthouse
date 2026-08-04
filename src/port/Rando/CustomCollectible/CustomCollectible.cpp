@@ -13,21 +13,21 @@ Actor* func_802D41C4(ActorMarker* marker, Gfx** gfx, Mtx** mtx, Vtx** vtx);
 }
 
 std::unordered_map<actor_e, CustomCollectibleDrawInfo> customCollectibleDrawInfo = {
-    { ACTOR_52_BLUE_EGG, { ASSET_36D_SPRITE_BLUE_EGG, CCT_VANILLA_SPRITE } },
-    { ACTOR_47_EMPTY_HONEYCOMB, { ASSET_361_MODEL_EMPTY_HONEYCOMB, CCT_VANILLA_MODEL } },
-    { ACTOR_49_EXTRA_LIFE, { ASSET_36E_MODEL_EXTRA_LIFE, CCT_VANILLA_SPRITE } },
-    { ACTOR_50_HONEYCOMB, { ASSET_363_MODEL_HONEYCOMB, CCT_VANILLA_MODEL } },
-    { ACTOR_46_JIGGY, { ASSET_35F_MODEL_JIGGY, CCT_VANILLA_MODEL } },
+    { ACTOR_52_BLUE_EGG, { ASSET_36D_SPRITE_BLUE_EGG, CCT_GENERIC_SPRITE } },
+    { ACTOR_47_EMPTY_HONEYCOMB, { ASSET_361_MODEL_EMPTY_HONEYCOMB, CCT_GENERIC_MODEL } },
+    { ACTOR_49_EXTRA_LIFE, { ASSET_36E_MODEL_EXTRA_LIFE, CCT_GENERIC_SPRITE } },
+    { ACTOR_50_HONEYCOMB, { ASSET_363_MODEL_HONEYCOMB, CCT_GENERIC_MODEL } },
+    { ACTOR_46_JIGGY, { ASSET_35F_MODEL_JIGGY, CCT_GENERIC_MODEL } },
     { ACTOR_60_JINJO_BLUE, { ASSET_3C0_MODEL_JINJO_BLUE, CCT_JINJO } },
     { ACTOR_62_JINJO_GREEN, { ASSET_3C2_MODEL_JINJO_GREEN, CCT_JINJO } },
     { ACTOR_5F_JINJO_ORANGE, { ASSET_3BC_MODEL_JINJO_ORANGE, CCT_JINJO } },
     { ACTOR_61_JINJO_PINK, { ASSET_3C1_MODEL_JINJO_PINK, CCT_JINJO } },
     { ACTOR_5E_JINJO_YELLOW, { ASSET_3BB_MODEL_JINJO_YELLOW, CCT_JINJO } },
     { ACTOR_12C_MOLEHILL, { ASSET_387_MODEL_BOTTLES, CCT_MOLEHILL } },
-    { ACTOR_2D_MUMBO_TOKEN, { ASSET_41A_SPRITE_MUMBO_TOKEN, CCT_VANILLA_SPRITE } },
-    { ACTOR_51_MUSIC_NOTE, { ASSET_6D6_SPRITE_MUSIC_NOTE, CCT_VANILLA_SPRITE } },
+    { ACTOR_2D_MUMBO_TOKEN, { ASSET_41A_SPRITE_MUMBO_TOKEN, CCT_GENERIC_SPRITE } },
+    { ACTOR_51_MUSIC_NOTE, { ASSET_6D6_SPRITE_MUSIC_NOTE, CCT_GENERIC_SPRITE } },
     { ACTOR_25E_SNS_EGG, { ASSET_50D_MODEL_SNS_EGG, CCT_VANILLA_SNS_EGG } },
-    { ACTOR_25D_ICE_KEY, { ASSET_50C_MODEL_ICE_KEY, CCT_VANILLA_MODEL } },
+    { ACTOR_25D_ICE_KEY, { ASSET_50C_MODEL_ICE_KEY, CCT_GENERIC_MODEL } },
     { ACTOR_3CD_CUSTOM_COLLECTIBLE, { ASSET_0_NONE, CCT_CUSTOM_MODEL } },
 };
 
@@ -62,7 +62,7 @@ ActorInfo customActorInfo = { MARKER_300_CUSTOM_COLLECTIBLE,
                               NULL,
                               0,
                               0,
-                              0.9f,
+                              0.8f,
                               0 };
 
 void CustomCollectible_Update(Actor* actor) {
@@ -72,17 +72,35 @@ void CustomCollectible_Update(Actor* actor) {
         actor->initialized = true;
         actor->marker->collidable = true;
 
-        if (customLocal->itemType == RITYPE_MUSIC_NOTE) {
-            actor->scale = 0.4f;
-        } else if (customLocal->itemType == RITYPE_SNS_EGG) {
-            actor->scale = 0.4f;
-        }
+        actor->scale = CustomCollectible::GetScale(customLocal->itemType);
     }
 
     if (customLocal->itemType == RITYPE_MOLEHILL || customLocal->itemType == RITYPE_JINJO) {
         CustomCollectible::FacePlayer(actor);
     } else {
         actor->yaw += 5.0f;
+    }
+
+    // Sparkles
+    if (customCollectibleDrawInfo[customLocal->actorId].drawType != CCT_GENERIC_SPRITE) {
+        for (int i = 0; i < 4; i++) {
+            if (randf() < 0.03) {
+                commonParticle_add(actor->marker, i + 5, func_80329904);
+                commonParticle_new((common_particle_e)8, actor->marker->unk14_21);
+            }
+        }
+    }
+}
+
+f32 CustomCollectible::GetScale(RandoItemType itemType) {
+    switch (itemType) { 
+        case RITYPE_MUSIC_NOTE:
+        case RITYPE_SNS_EGG:
+            return 0.42857143f;
+        case RITYPE_EMPTY_HONEYCOMB:
+            return 0.8f;
+        default:
+            return 1.0f;
     }
 }
 
@@ -170,11 +188,12 @@ ActorInfo CustomCollectible::GetActorAndDrawInfo(RandoItemId randoItemId) {
     collectibleInfo.modelId = drawInfo.drawModel;
 
     switch (drawInfo.drawType) {
-        case CCT_VANILLA_MODEL:
+        case CCT_GENERIC_MODEL:
             collectibleInfo.draw_func = actor_draw;
             break;
-        case CCT_VANILLA_SPRITE:
+        case CCT_GENERIC_SPRITE:
             collectibleInfo.draw_func = fxTouchSparkle_draw;
+            collectibleInfo.shadow_scale = 0.0f;
             break;
         case CCT_JINJO:
             collectibleInfo.draw_func = actor_draw;

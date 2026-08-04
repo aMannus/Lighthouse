@@ -10,8 +10,8 @@ typedef struct {
 } ActorLocal_CustomCollectible;
 
 enum CustomCollectibleDrawTypes {
-    CCT_VANILLA_MODEL, 
-    CCT_VANILLA_SPRITE,
+    CCT_GENERIC_MODEL, 
+    CCT_GENERIC_SPRITE,
     CCT_JINJO,
     CCT_MOLEHILL, 
     CCT_VANILLA_SNS_EGG, 
@@ -34,5 +34,6 @@ private:
 
 public:
     static Actor* Spawn(int32_t position[3], RandoCheckId randoCheckId);
+    static f32 GetScale(RandoItemType itemType);
     static void FacePlayer(Actor* actor);
 };
