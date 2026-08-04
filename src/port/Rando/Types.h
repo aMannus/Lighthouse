@@ -2395,7 +2395,8 @@ typedef struct RandoSaveCheck {
     RandoItemId randoItemId;
     int32_t randoCollectionId;
     bool isShuffled;
-    bool obtained;
+    bool eligible;
+    bool received;
     bool skipped;
 } RandoSaveCheck;
 

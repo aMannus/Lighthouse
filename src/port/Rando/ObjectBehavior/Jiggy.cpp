@@ -13,7 +13,7 @@ void Rando::ObjectBehavior::InitJiggyBehavior() {
             return;
         }
 
-        if (RANDO_SAVE_CHECKS[RC_MMM_JIGGY_MANSION_TABLE].obtained) {
+        if (RANDO_SAVE_CHECKS[RC_MMM_JIGGY_MANSION_TABLE].eligible) {
             *should = false;
         }
     })

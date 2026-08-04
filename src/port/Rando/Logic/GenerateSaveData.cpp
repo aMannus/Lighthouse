@@ -128,7 +128,7 @@ void Rando::Logic::InitializeSaveData(SaveData* saveData) {
             // .randoItemId = Rando::StaticData::GetRandoItemByActorId((actor_e)randoStaticCheck.actorId),
             .randoCollectionId = randoStaticCheck.collectionId,
             .isShuffled = false,
-            .obtained = false,
+            .eligible = false,
             .skipped = false,
         };
 

@@ -3,6 +3,8 @@
 #include <unordered_map>
 
 #include <libultraship/bridge.h>
+#include "port/ShipInit.hpp"
+#include <queue>
 
 extern "C" {
 #include "functions.h"
@@ -11,6 +13,8 @@ void __chJinjo_802CDC9C(Actor* thisx, s16 arg1);
 Actor* func_802D94B4(ActorMarker* marker, Gfx** gfx, Mtx** mtx, Vtx** vtx);
 Actor* func_802D41C4(ActorMarker* marker, Gfx** gfx, Mtx** mtx, Vtx** vtx);
 }
+
+static std::queue<QueuedProp> propQueue;
 
 std::unordered_map<actor_e, CustomCollectibleDrawInfo> customCollectibleDrawInfo = {
     { ACTOR_52_BLUE_EGG, { ASSET_36D_SPRITE_BLUE_EGG, CCT_GENERIC_SPRITE } },
@@ -143,7 +147,6 @@ Actor* CustomCollectible::Spawn(int32_t position[3], RandoCheckId randoCheckId) 
     int32_t flags = ACTOR_FLAG_UNKNOWN_6 | ACTOR_FLAG_UNKNOWN_7 | ACTOR_FLAG_UNKNOWN_21;
 
     RandoItemId randoItemId = RANDO_SAVE_CHECKS[randoCheckId].randoItemId;
-    randoItemId = RI_AP_ITEM_PROGRESSION;
     RandoItemType itemType = Rando::StaticData::Items[randoItemId].randoItemType;
 
     // actor_new stores the ActorInfo* permanently, so it must outlive Spawn()
@@ -226,3 +229,29 @@ void CustomCollectible::OnCollect(struct actorMarker_s* self, struct actorMarker
     ItemQueue::AddCheck(customLocal->randoCheckId);
     marker_despawn(self);
 }
+
+// When regular props are spawned in BK, the game isn't fully set up yet to spawn
+// actors. So we delay prop spawns until the game's ready to spawn actors.
+void CustomCollectible::QueueProp(int32_t position[3], RandoCheckId randoCheckId) {
+    QueuedProp queuedProp;
+    queuedProp.position[0] = position[0];
+    queuedProp.position[1] = position[1];
+    queuedProp.position[2] = position[2];
+    queuedProp.randoCheckId = randoCheckId;
+    propQueue.push(queuedProp);
+}
+
+void CustomCollectible::ProcessPropQueue() {
+   while (propQueue.size() > 0) {
+        QueuedProp prop = propQueue.front();
+        Actor* actor = CustomCollectible::Spawn(prop.position, prop.randoCheckId);
+        propQueue.pop();
+    }
+}
+
+void RegisterCustomCollectible() {
+    COND_HOOK(OnActorSpawn, EVENT_PRIORITY_NORMAL, IS_RANDO,
+              [](IEvent* event) { CustomCollectible::ProcessPropQueue(); });
+}
+
+static RegisterShipInitFunc initFunc(RegisterCustomCollectible, { "IS_RANDO" });

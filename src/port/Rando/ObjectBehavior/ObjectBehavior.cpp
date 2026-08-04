@@ -248,7 +248,6 @@ void Rando::ObjectBehavior::Init() {
     InitJinjoBehavior();
     InitMolehillBehavior();
     InitMusicNoteBehavior();
-    InitPropBehavior();
     InitStopNSwopBehavior();
 
     UpdateJunkList();
@@ -266,7 +265,7 @@ void Rando::ObjectBehavior::Init() {
 
         if (currentMap == MAP_12_GV_GOBIS_VALLEY) {
             if (ev->actorId == ACTOR_118_GRABBA) {
-                event->Cancelled = RANDO_SAVE_CHECKS[RC_GV_JIGGY_GRABBA].obtained;
+                event->Cancelled = RANDO_SAVE_CHECKS[RC_GV_JIGGY_GRABBA].eligible;
                 ev->result = NULL;
             }
         }

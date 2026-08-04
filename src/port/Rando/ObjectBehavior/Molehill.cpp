@@ -78,7 +78,7 @@ bool CheckBridgeState() {
     int32_t smBridgeCheck = 0;
     if (!mapSpecificFlags_get(SM_SPECIFIC_FLAG_3_ALL_SM_ABILITIES_LEARNED)) {
         for (auto& check : spiralMountainBridge) {
-            if (Rando::Logic::GetShuffledObject(check).obtained) {
+            if (Rando::Logic::GetShuffledObject(check).eligible) {
                 smBridgeCheck++;
             }
         }

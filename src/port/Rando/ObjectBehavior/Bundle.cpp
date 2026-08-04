@@ -545,7 +545,7 @@ void Rando::ObjectBehavior::InitBundleBehavior() {
         }
 
         RandoSaveCheck randoSaveCheck = RANDO_SAVE_CHECKS[randoCheckId];
-        if (randoSaveCheck.obtained) {
+        if (randoSaveCheck.eligible) {
             actor_e actorId = (actor_e)Rando::StaticData::Items[randoSaveCheck.randoItemId].actorId;
             *actor =
                 CustomObject::SpawnCustomActorEX(randoCheckId, spawnPosition, &actorInfoMap.at((actor_e)actorId).first,

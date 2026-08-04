@@ -204,7 +204,7 @@ void CustomObject::FlushRandoSpawnQueue() {
         }
 
         actor_e randoActorId = Rando::StaticData::GetActorIdByRandoItemId(randoSaveCheck.randoItemId);
-        if (randoSaveCheck.obtained) {
+        if (randoSaveCheck.eligible) {
             randoActorId = GetRandomJunkActorId(randoSaveCheck);
         }
 
@@ -217,7 +217,7 @@ void CustomObject::FlushRandoSpawnQueue() {
                                                               &actorInfoMap.at(randoActorId).first,
                                                               actorInfoMap.at(randoActorId).second);
 
-        if (randoSaveCheck.obtained && RANDO_SAVE_OPTIONS[RO_SPAWN_JUNK].optionValue == RO_GENERIC_ON) {
+        if (randoSaveCheck.eligible && RANDO_SAVE_OPTIONS[RO_SPAWN_JUNK].optionValue == RO_GENERIC_ON) {
             customActor->marker->unk14_21 = true;
             customActor->scale = 1.0f;
         }
@@ -250,7 +250,7 @@ Actor* CustomObject::ShouldCreateCustomActorEX(RandoCheckId randoCheckId, int32_
         return NULL;
     }
 
-    if (randoSaveCheck.obtained) {
+    if (randoSaveCheck.eligible) {
         if (refActor != nullptr) {
             randoActorId = (actor_e)refActor->modelCacheIndex;
         } else {
@@ -335,10 +335,10 @@ void CustomObject::ResolveCustomActorCollisionEX(RandoCheckId randoCheckId) {
 
 void CustomObject::CheckObtainedEX(RandoCheckId randoCheckId, bool isInit) {
     for (auto& pool : Rando::Logic::shuffledPool) {
-        if (pool.randoCheckId == randoCheckId && !pool.obtained) {
-            pool.obtained = true;
+        if (pool.randoCheckId == randoCheckId && !pool.eligible) {
+            pool.eligible = true;
             shouldRemoveEX = true;
-            RANDO_SAVE_CHECKS[pool.randoCheckId].obtained = true;
+            RANDO_SAVE_CHECKS[pool.randoCheckId].eligible = true;
             CustomObject::RemoveSpawnedIdFromList(randoCheckId);
             if (!isInit) {
                 Rando::StaticData::SendCollisionNotification(pool.randoCheckId);

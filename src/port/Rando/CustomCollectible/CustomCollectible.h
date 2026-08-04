@@ -23,6 +23,11 @@ typedef struct {
     CustomCollectibleDrawTypes drawType;
 } CustomCollectibleDrawInfo;
 
+typedef struct {
+    s32 position[3];
+    RandoCheckId randoCheckId;
+} QueuedProp;
+
 void CustomCollectible_Update(Actor* actor);
 
 class CustomCollectible {
@@ -36,4 +41,6 @@ public:
     static Actor* Spawn(int32_t position[3], RandoCheckId randoCheckId);
     static f32 GetScale(RandoItemType itemType);
     static void FacePlayer(Actor* actor);
+    static void QueueProp(int32_t position[3], RandoCheckId randoCheckId);
+    static void ProcessPropQueue();
 };

@@ -19,7 +19,7 @@ void Rando::ObjectBehavior::InitJinjoBehavior() {
         OnSetJiggyList* ev = (OnSetJiggyList*)event;
 
         for (auto& location : Rando::Logic::shuffledPool) {
-            if (!location.obtained) {
+            if (!location.eligible) {
                 continue;
             }
 
