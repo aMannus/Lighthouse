@@ -5,17 +5,7 @@
 #include "spdlog/spdlog.h"
 #include "enums.h"
 
-extern "C" {
-s32 getGameMode(void);
-void mapSpecificFlags_set(s32 i, s32 val);
-s32 mapSpecificFlags_get(s32 i);
-
-enum map_e gsworld_getMap(void);
-enum level_e map_getLevel(enum map_e map);
-
-Struct70s* func_8034C5AC(s32 arg0);
-void func_8034E71C(Struct73s* arg0, s32 arg1, f32 arg2);
-}
+#include "functions.h"
 
 // These read per-file save data, so they must not be evaluated before a file is selected.
 #define EMPTY_HONEYCOMB_OPTION_ENABLED \
@@ -183,6 +173,13 @@ void Rando::MiscBehavior::InitWorldStateBehavior() {
                         break;
                     }
                 }
+                if (ev->jiggyId == JIGGY_37_LAIR_BGS_WITCH_SWITCH) {
+                    if (currenLevel == LEVEL_6_LAIR) {
+                        event->Cancelled = true;
+                        ev->result = RANDO_SAVE_CHECKS[RC_GL_JIGGY_WITCH_SWITCH_BUBBLEGLOOP_SWAMP].obtained;
+                        break;
+                    }
+                }
 
                 event->Cancelled = true;
                 ev->result = randoSaveCheck.eligible;
@@ -205,11 +202,27 @@ void Rando::MiscBehavior::InitWorldStateBehavior() {
             if (randoCheckId == RC_MMM_JIGGY_TUMBLARS_PUZZLE) {
                 ev->result = mapSpecificFlags_get(MMM_SPECIFIC_FLAG_TUMBLAR_BROKEN);
             } else if (randoCheckId == RC_CC_JIGGY_CLANKER_RAISED) {
-                ev->result = RANDO_SAVE_FLAGS[RANDO_INF_CLANKER_RAISED].flagState;
+                // Clanker's height and his rings' water level are both recalled from
+                // this query, so it has to answer for the world event and not just
+                // for a reward still sitting in the level.
+                ev->result = RANDO_SAVE_FLAGS[RANDO_INF_CLANKER_RAISED].flagState ||
+                             CustomObject::CheckSpawnedIdList(randoCheckId);
+            } else if (randoCheckId == RC_CC_JIGGY_RINGS) {
+                ev->result = RANDO_SAVE_FLAGS[RANDO_INF_MINIGAME_RINGS_COMPLETED].flagState ||
+                             CustomObject::CheckSpawnedIdList(randoCheckId);
             } else {
-                ev->result = CustomObject::CheckSpawnedIdList(randoCheckId);
+                ev->result = CustomObject::CheckSpawnedIdList(randoCheckId) || RANDO_SAVE_CHECKS[randoCheckId].obtained;
             }
         }
+    })
+
+    // Drop the id-keyed requirement for the MMM floorboard honeycomb (marker.c)
+    COND_VB_SHOULD(VB_HONEYCOMB_PUMPKIN_REQUIREMENT, EVENT_PRIORITY_NORMAL, true, {
+        (void)args;
+        if (!IS_RANDO || !EMPTY_HONEYCOMB_OPTION_ENABLED) {
+            return;
+        }
+        *should = false;
     })
 
     REGISTER_LISTENER(OnIsHoneycombScoreCollected, EVENT_PRIORITY_NORMAL, [](IEvent* event) {

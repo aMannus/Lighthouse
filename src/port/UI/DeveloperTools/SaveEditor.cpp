@@ -13,10 +13,8 @@
 #include "port/UI/LighthouseGui.hpp"
 #include "port/UI/cvar_prefixes.h"
 
-extern "C" {
 #include "enums.h"
 #include "prop.h"
-}
 
 #define DEFAULT_MAX_HEALTH 8
 #define DEFAULT_MAX_EGGS 100
@@ -27,16 +25,8 @@ extern "C" {
 #define HONEYCOMB_ID_MULTIPLIER(levelId) (1 + (2 * (levelId - 1)))
 
 extern "C" {
-bool player_is_present(void);
-s32 item_getCount(enum item_e item);
-void item_set(s32 item, s32 val);
-bool fileProgressFlag_get(enum file_progress_e index);
-void fileProgressFlag_set(enum file_progress_e index, s32 set);
-int ability_isUnlocked(enum ability_e uid);
-void ability_setLearned(s32 move, s32 val);
-u32 jiggyscore_isCollected(enum jiggy_e jiggy_id);
+bool ability_isUnlocked(enum ability_e uid);
 void jiggyscore_setCollected(s32 indx, s32 val);
-bool honeycombscore_get(enum honeycomb_e indx);
 void honeycombscore_set(enum honeycomb_e indx, bool val);
 void mumboscore_set(enum mumbotoken_e indx, bool val);
 
@@ -367,6 +357,10 @@ void SaveEditor_DrawProgressTab() {
 
 void DrawRandoFlagEditor() {
     ImGui::SeparatorText("Rando INF Flags");
+    if (selectedFileNum == DEFAULT_FILE_NUM) {
+        ImGui::Text("No Save File Loaded");
+        return;
+    }
     if (ImGui::BeginChild("RandoFlagChild")) {
         for (int f = RANDO_INF_UNKNOWN; f < RANDO_INF_MAX; f++) {
             ImGui::PushID(f);
@@ -381,7 +375,7 @@ void DrawRandoFlagEditor() {
 }
 
 void DrawRandoCheckEditor() {
-    if (Rando::Logic::shuffledPool.empty()) {
+    if (selectedFileNum == DEFAULT_FILE_NUM || Rando::Logic::shuffledPool.empty()) {
         ImGui::Text("No Rando Save Data");
     } else {
         static ImGuiTextFilter rcFilter;
@@ -407,8 +401,17 @@ void DrawRandoCheckEditor() {
                 ImGui::TableNextColumn();
 
                 for (auto& check : RANDO_SAVE_CHECKS) {
-                    if (!rcFilter.PassFilter(check.name) &&
-                        !rcFilter.PassFilter(Rando::StaticData::Items[check.randoItemId].name)) {
+                    auto checkEntry = Rando::StaticData::Checks.find(check.randoCheckId);
+                    if (checkEntry == Rando::StaticData::Checks.end()) {
+                        continue;
+                    }
+                    const char* checkName = checkEntry->second.name;
+
+                    auto itemEntry = Rando::StaticData::Items.find(check.randoItemId);
+                    const char* itemName =
+                        (itemEntry != Rando::StaticData::Items.end()) ? itemEntry->second.name : nullptr;
+
+                    if (!rcFilter.PassFilter(checkName) && !rcFilter.PassFilter(itemName)) {
                         continue;
                     }
 
@@ -454,8 +457,7 @@ void DrawRandoCheckEditor() {
                     }
                     ImGui::TableNextColumn();
 
-                    std::string checkName = Rando::StaticData::Checks[check.randoCheckId].name;
-                    ImGui::TextWrapped(checkName.c_str());
+                    ImGui::TextWrapped("%s", checkName);
                     ImGui::TableNextColumn();
 
                     ImGui::TextWrapped(Rando::StaticData::Items[check.randoItemId].name);

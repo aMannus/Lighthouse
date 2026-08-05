@@ -13,17 +13,9 @@
 #define CVAR_SHOW_COLLISION_NOTIFICATIONS CVarGetInteger(CVAR_NAME_SHOW_COLLISION_NOTIFICATIONS, 0)
 
 extern "C" {
-void player_getPosition(f32 dst[3]);
-Actor* marker_getActor(ActorMarker* thisx);
-bool func_802C9C14(Actor* actor);
-
-s32 mapSpecificFlags_get(s32 i);
-
-void coMusicPlayer_playMusic(enum comusic_e track_id, s32 volume);
 extern ActorArray* suBaddieActorArray;
 }
 
-bool isSaveState = false;
 std::map<RandoCheckId, std::tuple<int32_t, int32_t, int32_t>> randoSaveState;
 
 // clang-format off
@@ -102,12 +94,10 @@ bool IsActorWhitelisted(int32_t actorId) {
         }
     }
 
-    if (!isSaveState) {
-        if (CVarGetInteger(Rando::StaticData::Options[RO_SPAWN_JUNK].cvar, 0) == RO_GENERIC_ON) {
-            for (auto& junk : junkItemList) {
-                if (junk == actorId) {
-                    return true;
-                }
+    if (CVarGetInteger(Rando::StaticData::Options[RO_SPAWN_JUNK].cvar, 0) == RO_GENERIC_ON) {
+        for (auto& junk : junkItemList) {
+            if (junk == actorId) {
+                return true;
             }
         }
     }
@@ -168,46 +158,61 @@ Actor* FindActorByRandoCheckId(RandoCheckId randoCheckId) {
     return NULL;
 }
 
+// subject is "You" or a teammate's name for Anchor remote collects.
+static void EmitCheckNotification(RandoCheckId randoCheckId, const std::string& subject) {
+    RandoSaveCheck randoSaveCheck = RANDO_SAVE_CHECKS[randoCheckId];
+    std::string prefix;
+    std::string message;
+    std::string suffix = "";
+    ImVec4 itemColor = WIDGET_TEXT_COLOR(randoItemColors.at(randoSaveCheck.randoItemId));
+
+    if (randoSaveCheck.randoItemId == RI_MOLEHILL) {
+        prefix = subject + " learned";
+        message = abilityNameList[randoSaveCheck.randoCollectionId].c_str();
+    } else if (randoSaveCheck.randoItemId == RI_STOP_N_SWOP_EGG || randoSaveCheck.randoItemId == RI_STOP_N_SWOP_KEY) {
+        int32_t totalsnsItems = Rando::Logic::GetTotalSnsItemsCollected();
+        prefix = subject + " collected ";
+        prefix += Rando::StaticData::Items[randoSaveCheck.randoItemId].article;
+
+        message = Rando::StaticData::Items[randoSaveCheck.randoItemId].name;
+        suffix = "(";
+        suffix += std::to_string(totalsnsItems);
+        suffix += " / 7)";
+
+        itemColor = WIDGET_TEXT_COLOR(snsItemColors.at(randoSaveCheck.randoCollectionId));
+    } else {
+        prefix = subject + " collected ";
+        prefix += Rando::StaticData::Items[randoSaveCheck.randoItemId].article;
+        message = Rando::StaticData::Items[randoSaveCheck.randoItemId].name;
+    }
+
+    Notification::Emit({
+        .prefix = prefix,
+        .prefixColor = WIDGET_TEXT_COLOR(UIWidgets::Colors::White),
+        .message = message,
+        .messageColor = itemColor,
+        .suffix = suffix,
+        .suffixColor = WIDGET_TEXT_COLOR(UIWidgets::Colors::White),
+    });
+}
+
 void Rando::StaticData::SendCollisionNotification(RandoCheckId randoCheckId) {
     if (CVAR_SHOW_COLLISION_NOTIFICATIONS) {
-        RandoSaveCheck randoSaveCheck = RANDO_SAVE_CHECKS[randoCheckId];
-        actor_e actorId = Rando::StaticData::GetActorIdByRandoItemId(randoSaveCheck.randoItemId);
-        std::string prefix;
-        std::string message;
-        std::string suffix = "";
-        ImVec4 itemColor = WIDGET_TEXT_COLOR(randoItemColors.at(actorId));
-
-        if (actorId == ACTOR_12C_MOLEHILL) {
-            prefix = "You learned";
-            message = abilityNameList[randoSaveCheck.randoCollectionId].c_str();
-        } else if (randoSaveCheck.randoItemId >= RI_STOP_N_SWOP_EGG_BLUE &&
-                   randoSaveCheck.randoItemId <= RI_STOP_N_SWOP_ICE_KEY) {
-            int32_t totalsnsItems = Rando::Logic::GetTotalSnsItemsCollected();
-            prefix = "You collected ";
-            prefix += Rando::StaticData::Items[randoSaveCheck.randoItemId].article;
-
-            message = Rando::StaticData::Items[randoSaveCheck.randoItemId].name;
-            suffix = "(";
-            suffix += std::to_string(totalsnsItems);
-            suffix += " / 7)";
-
-            itemColor = WIDGET_TEXT_COLOR(snsItemColors.at(randoSaveCheck.randoCollectionId));
-        } else {
-            prefix = "You collected ";
-            prefix += Rando::StaticData::Items[randoSaveCheck.randoItemId].article;
-            message = Rando::StaticData::Items[randoSaveCheck.randoItemId].name;
-        }
-
-        Notification::Emit({
-            .prefix = prefix,
-            .prefixColor = WIDGET_TEXT_COLOR(UIWidgets::Colors::White),
-            .message = message,
-            .messageColor = itemColor,
-            .suffix = suffix,
-            .suffixColor = WIDGET_TEXT_COLOR(UIWidgets::Colors::White),
-        });
+        EmitCheckNotification(randoCheckId, "You");
     }
 };
+
+void Rando::StaticData::SendRemoteCheckNotification(RandoCheckId randoCheckId, const std::string& collectorName) {
+    EmitCheckNotification(randoCheckId, collectorName);
+};
+
+bool ShouldOverrideSpawn(RandoCheckId randoCheckId) {
+    if (Rando::Logic::IsCheckShuffled(randoCheckId)) {
+        return true;
+    }
+
+    return false;
+}
 
 bool CheckEnemyOverlapPosition(int32_t pos[3]) {
     level_e levelId = map_getLevel(gsworld_getMap());
@@ -312,12 +317,12 @@ void Rando::ObjectBehavior::Init() {
     COND_HOOK(OnLoadActorSaveState, EVENT_PRIORITY_NORMAL, IS_RANDO, [](IEvent* event) {
         OnLoadActorSaveState* ev = (OnLoadActorSaveState*)event;
 
-        isSaveState = true;
+        // Decide up front whether this restore is ours: anything we don't manage falls
+        // through to the vanilla restore untouched. The predicate has to be the same one
+        // the save side recorded under, junk included.
         if (!IsActorWhitelisted((actor_e)ev->actor->modelCacheIndex)) {
-            event->Cancelled = true;
             return;
         }
-        isSaveState = false;
 
         if (randoSaveState.empty()) {
             return;
@@ -341,12 +346,16 @@ void Rando::ObjectBehavior::Init() {
             return;
         }
 
+        // The check already has a live actor. Restoring would stack a second one on
+        // top of it, so drop the restore entirely.
         if (CustomObject::CheckSpawnedIdList(randoCheckId)) {
             event->Cancelled = true;
             return;
         }
 
-        Actor* randoCustomActor = CustomObject::ShouldCreateCustomActorEX(randoCheckId, position, false, ev->actor);
+        // refActor keeps an obtained check restoring the junk actor it was saved as
+        // instead of rolling a fresh one.
+        CustomObject::ShouldCreateCustomActorEX(randoCheckId, position, false, ev->actor);
         randoSaveState.erase(randoCheckId);
         event->Cancelled = true;
     })

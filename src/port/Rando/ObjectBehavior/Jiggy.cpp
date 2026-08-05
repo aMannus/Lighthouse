@@ -7,6 +7,26 @@
 
 #define OPTION_ENABLED RANDO_SAVE_OPTIONS[RO_SHUFFLE_JIGGIES].optionValue
 
+// Some jiggies double as the world's only memory of what opened them up: raising
+// Clanker and finishing his rings are both recalled purely from
+// jiggyscore_isSpawned on the jiggy that appeared. Vanilla records that in
+// jiggy_spawn via jiggyscore_setSpawned, which the override below never reaches,
+// and the check-obtained path only fires once the reward is actually picked up.
+static void MarkWorldStateFromJiggySpawn(RandoCheckId randoCheckId) {
+    RandoInf randoInfFlag = RANDO_INF_UNKNOWN;
+    switch (randoCheckId) {
+        case RC_CC_JIGGY_CLANKER_RAISED:
+            randoInfFlag = RANDO_INF_CLANKER_RAISED;
+            break;
+        case RC_CC_JIGGY_RINGS:
+            randoInfFlag = RANDO_INF_MINIGAME_RINGS_COMPLETED;
+            break;
+        default:
+            return;
+    }
+    CALL_EVENT(SetRandoInfFlag, randoInfFlag, 1);
+}
+
 bool OverrideJiggySpawn(f32 position[3], jiggy_e jiggyId) {
     RandoCheckId randoCheckId = Rando::StaticData::GetCheckByJiggyId(jiggyId);
 
@@ -26,6 +46,9 @@ bool OverrideJiggySpawn(f32 position[3], jiggy_e jiggyId) {
     if (jiggyId != JIGGY_17_CC_CLANKER_RAISED && jiggyId != JIGGY_1B_CC_TOOTH) {
         ApplyCustomActorPhysics(randoCheckId, actor, false);
     }
+    // Stand in for the jiggyscore_setSpawned this override skips, for the
+    // jiggies the world reads back as state rather than as a collectable.
+    MarkWorldStateFromJiggySpawn(randoCheckId);
     return true;
 }
 

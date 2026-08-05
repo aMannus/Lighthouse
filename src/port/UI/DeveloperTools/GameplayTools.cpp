@@ -21,23 +21,6 @@
 #include "include/core1/sns.h"
 
 extern "C" {
-void sns_set_item_state(enum StopNSwop_Item item, s32 set, s32 state);
-void jiggy_spawn(enum jiggy_e jiggy_id, f32 pos[3]);
-void player_getPosition(f32 dst[3]);
-void player_getPosition_s32(s32 arg0[3]);
-enum map_e gsworld_getMap(void);
-Actor* actor_new(s32 position[3], s32 yaw, ActorInfo* actorInfo, u32 flags);
-void func_8031D04C(enum map_e arg0, s32 exit_id);
-
-void item_set(s32 item, s32 val);
-void ability_setAllLearned(s32 val);
-void ability_setAllUsed(s32 val);
-
-s32 mapSpecificFlags_get(s32 i);
-void mapSpecificFlags_set(s32 i, s32 val);
-enum map_e gsworld_getMap(void);
-enum level_e map_getLevel(enum map_e map);
-
 typedef struct {
     enum honeycomb_e uid;
     s32 unk4;
@@ -166,17 +149,17 @@ std::vector<GameplayToolsMapData> mapSpecificFlagList = {
     { TTC_SPECIFIC_FLAG_5_CLAM_FIRST_MEET_TEXT_SHOWN,			"TTC_SPECIFIC_FLAG_5_CLAM_FIRST_MEET_TEXT_SHOWN", 			LEVEL_2_TREASURE_TROVE_COVE },
     { TTC_SPECIFIC_FLAG_7_NIPPER_FIRST_MEET_TEXT_SHOWN,			"TTC_SPECIFIC_FLAG_7_NIPPER_FIRST_MEET_TEXT_SHOWN", 		LEVEL_2_TREASURE_TROVE_COVE },
     { BGS_SPECIFIC_FLAG_1,					 					"BGS_SPECIFIC_FLAG_1", 										LEVEL_4_BUBBLEGLOOP_SWAMP },
-    { BGS_SPECIFIC_FLAG_WALKWAY_JIGGY_RESET,					"BGS_SPECIFIC_FLAG_WALKWAY_JIGGY_RESET", 					LEVEL_4_BUBBLEGLOOP_SWAMP },
-    { BGS_SPECIFIC_FLAG_WALKWAY_JIGGY_TIMER_RUNNING,			"BGS_SPECIFIC_FLAG_WALKWAY_JIGGY_TIMER_RUNNING", 			LEVEL_4_BUBBLEGLOOP_SWAMP },
-    { BGS_SPECIFIC_FLAG_WALKWAY_JIGGY,					 		"BGS_SPECIFIC_FLAG_WALKWAY_JIGGY", 							LEVEL_4_BUBBLEGLOOP_SWAMP },
-    { BGS_SPECIFIC_FLAG_WALKWAY_JIGGY_SWITCH_PRESSED,			"BGS_SPECIFIC_FLAG_WALKWAY_JIGGY_SWITCH_PRESSED", 			LEVEL_4_BUBBLEGLOOP_SWAMP },
+    { BGS_SPECIFIC_FLAG_2_WALKWAY_JIGGY_RESET,					"BGS_SPECIFIC_FLAG_2_WALKWAY_JIGGY_RESET", 					LEVEL_4_BUBBLEGLOOP_SWAMP },
+    { BGS_SPECIFIC_FLAG_3_WALKWAY_JIGGY_TIMER_RUNNING,			"BGS_SPECIFIC_FLAG_3_WALKWAY_JIGGY_TIMER_RUNNING", 			LEVEL_4_BUBBLEGLOOP_SWAMP },
+    { BGS_SPECIFIC_FLAG_4_WALKWAY_JIGGY,					 		"BGS_SPECIFIC_FLAG_4_WALKWAY_JIGGY", 							LEVEL_4_BUBBLEGLOOP_SWAMP },
+    { BGS_SPECIFIC_FLAG_5_WALKWAY_JIGGY_SWITCH_PRESSED,			"BGS_SPECIFIC_FLAG_5_WALKWAY_JIGGY_SWITCH_PRESSED", 			LEVEL_4_BUBBLEGLOOP_SWAMP },
     { BGS_SPECIFIC_FLAG_7,					 					"BGS_SPECIFIC_FLAG_7", 										LEVEL_4_BUBBLEGLOOP_SWAMP },
     { BGS_SPECIFIC_FLAG_8,					 					"BGS_SPECIFIC_FLAG_8", 										LEVEL_4_BUBBLEGLOOP_SWAMP },
-    { BGS_SPECIFIC_FLAG_MAZE_JIGGY_SWITCH_PRESSED,				"BGS_SPECIFIC_FLAG_MAZE_JIGGY_SWITCH_PRESSED", 				LEVEL_4_BUBBLEGLOOP_SWAMP },
+    { BGS_SPECIFIC_FLAG_9_MAZE_JIGGY_SWITCH_PRESSED,				"BGS_SPECIFIC_FLAG_9_MAZE_JIGGY_SWITCH_PRESSED", 				LEVEL_4_BUBBLEGLOOP_SWAMP },
     { BGS_SPECIFIC_FLAG_A,					 					"BGS_SPECIFIC_FLAG_A", 										LEVEL_4_BUBBLEGLOOP_SWAMP },
-    { BGS_SPECIFIC_FLAG_MAZE_JIGGY_RESET,					 	"BGS_SPECIFIC_FLAG_MAZE_JIGGY_RESET", 						LEVEL_4_BUBBLEGLOOP_SWAMP },
-    { BGS_SPECIFIC_FLAG_MAZE_JIGGY_TIMER_RUNNING,				"BGS_SPECIFIC_FLAG_MAZE_JIGGY_TIMER_RUNNING", 				LEVEL_4_BUBBLEGLOOP_SWAMP },
-    { BGS_SPECIFIC_FLAG_MAZE_JIGGY,					 			"BGS_SPECIFIC_FLAG_MAZE_JIGGY", 							LEVEL_4_BUBBLEGLOOP_SWAMP },
+    { BGS_SPECIFIC_FLAG_B_MAZE_JIGGY_RESET,					 	"BGS_SPECIFIC_FLAG_B_MAZE_JIGGY_RESET", 						LEVEL_4_BUBBLEGLOOP_SWAMP },
+    { BGS_SPECIFIC_FLAG_C_MAZE_JIGGY_TIMER_RUNNING,				"BGS_SPECIFIC_FLAG_C_MAZE_JIGGY_TIMER_RUNNING", 				LEVEL_4_BUBBLEGLOOP_SWAMP },
+    { BGS_SPECIFIC_FLAG_D_MAZE_JIGGY,					 			"BGS_SPECIFIC_FLAG_D_MAZE_JIGGY", 							LEVEL_4_BUBBLEGLOOP_SWAMP },
     { FP_SPECIFIC_FLAG_0_XMAS_TREE_LIGHTS_ON,				 	"FP_SPECIFIC_FLAG_0_XMAS_TREE_LIGHTS_ON", 					LEVEL_5_FREEZEEZY_PEAK },
     { FP_SPECIFIC_FLAG_1_UNKNOWN,				 				"FP_SPECIFIC_FLAG_1_UNKNOWN", 								LEVEL_5_FREEZEEZY_PEAK },
     { FP_SPECIFIC_FLAG_2_XMAS_TREE_SWITCH,				 		"FP_SPECIFIC_FLAG_2_XMAS_TREE_SWITCH", 						LEVEL_5_FREEZEEZY_PEAK },
@@ -493,9 +476,41 @@ void DrawGrantUnlocks() {
     }
 }
 
+// Index 0 traces every space; the rest are ANCHOR_FLAGSPACE_* ids offset by one.
+static const std::unordered_map<int32_t, const char*> flagTraceSpaces = {
+    { 0, "All" },          { 1, "File Progress" }, { 2, "Volatile" }, { 3, "Level Specific" },
+    { 4, "Map Specific" }, { 5, "Rando Inf" },
+};
+
+void DrawFlagTracer() {
+    ImGui::SeparatorText("Flag Tracer");
+    ImGui::TextWrapped("Logs every flag write to the console and log file, with the flag's enum name and a marker on "
+                       "each map load.");
+
+    UIWidgets::CVarCheckbox("Trace Flag Writes", CVAR_DEVELOPER_TOOLS("FlagTrace"),
+                            UIWidgets::CheckboxOptions().Color(THEME_COLOR).DefaultValue(false));
+
+    if (!CVarGetInteger(CVAR_DEVELOPER_TOOLS("FlagTrace"), 0)) {
+        return;
+    }
+
+    UIWidgets::CVarCombobox("Flag Space", CVAR_DEVELOPER_TOOLS("FlagTraceSpace"), flagTraceSpaces,
+                            UIWidgets::ComboboxOptions()
+                                .Color(THEME_COLOR)
+                                .Tooltip("Limit tracing to a single flag space.")
+                                .DefaultIndex(0));
+    UIWidgets::CVarCheckbox("Include Call Stacks", CVAR_DEVELOPER_TOOLS("FlagTraceStacks"),
+                            UIWidgets::CheckboxOptions()
+                                .Color(THEME_COLOR)
+                                .DefaultValue(false)
+                                .Tooltip("Name the function and line that set each flag."));
+}
+
 void DrawMonitoringTools() {
     level_e currentLevel = map_getLevel(gsworld_getMap());
     int32_t mapIndex = 0;
+
+    DrawFlagTracer();
 
     ImGui::SeparatorText("Map Specific Flags");
     if (ImGui::BeginChild("MapFlagChild")) {

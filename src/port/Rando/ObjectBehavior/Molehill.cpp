@@ -11,6 +11,7 @@ s32 mapSpecificFlags_get(s32 i);
 void mapSpecificFlags_set(s32 i, s32 val);
 }
 
+// clang-format off
 std::vector<RandoCheckId> spiralMountainBridge = {
     RC_SM_MOLEHILL_JUMP,
     RC_SM_MOLEHILL_CAMERA_CONTROL,

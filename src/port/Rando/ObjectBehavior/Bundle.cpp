@@ -59,8 +59,6 @@ void Rando::ObjectBehavior::InitBundleBehavior() {
         spawnPosition[1] = (int32_t)position[1];
         spawnPosition[2] = (int32_t)position[2];
 
-        SPDLOG_INFO("Bundle ID: {} :: {}, {}, {}", (int32_t)bundleId, spawnPosition[0], spawnPosition[1], spawnPosition[2]);
-
         if (bundleId == BUNDLE_16__HONEYCOMB &&
             (currentMap == MAP_43_CCW_SPRING || currentMap == MAP_B_CC_CLANKERS_CAVERN)) {
             if (CheckEnemyOverlapPosition(spawnPosition)) {
@@ -271,6 +269,8 @@ void Rando::ObjectBehavior::InitBundleBehavior() {
                                 (RandoCheckId)((int32_t)RC_FP_HONEYCOMB_BEEHIVE_SCARF_START_1 + bundleCount);
                         }
                         break;
+                    default:
+                        break;
                 }
                 break;
             case LEVEL_6_LAIR:
@@ -368,6 +368,7 @@ void Rando::ObjectBehavior::InitBundleBehavior() {
                         break;
                     case BUNDLE_D__EMPTY_HONEYCOMB:
                         randoCheckId = RC_GV_EMPTY_HONEYCOMB_GOBI;
+                        break;
                     case BUNDLE_18__HONEYCOMB:
                         if (position[1] < 2990 && position[1] > 2980) {
                             randoCheckId =
