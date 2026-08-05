@@ -65,9 +65,11 @@ void ItemQueue::Process() {
 
     // Grant item
     RandoSaveCheck randoSaveCheck = RANDO_SAVE_CHECKS[randoCheckId];
-    ItemQueue::GiveItem(randoSaveCheck.randoItemId);
-    ItemQueue::SendNotification(randoSaveCheck.randoItemId);
-    randoSaveCheck.received = true;
+    if (!randoSaveCheck.received) {
+        ItemQueue::GiveItem(randoSaveCheck.randoItemId);
+        ItemQueue::SendNotification(randoSaveCheck.randoItemId);
+        randoSaveCheck.received = true;
+    }
 
     itemQueue.pop();
 }

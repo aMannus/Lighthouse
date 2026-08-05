@@ -36,10 +36,6 @@ bool CheckBridgeState() {
     return smBridgeCheck == BRIDGE_REQUIREMENT ? true : false;
 }
 
-void SetSpiralMountainFlags() {
-    mapSpecificFlags_set(SM_SPECIFIC_FLAG_1_TALKED_TO_BOTTLES, true);
-}
-
 bool OverrideMoleSpawn(OnActorSpawn* ev) {
     if (ev->actorId != ACTOR_12B_TUTORIAL_BOTTLES) {
         return false;

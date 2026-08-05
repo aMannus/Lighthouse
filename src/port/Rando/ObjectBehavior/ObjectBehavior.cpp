@@ -244,7 +244,6 @@ static void FireClearBundleDespawnQueue() {
 // Entry point for the module, run once on game boot
 void Rando::ObjectBehavior::Init() {
     InitBundleBehavior();
-    InitJiggyBehavior();
     InitJinjoBehavior();
     InitStopNSwopBehavior();
 
