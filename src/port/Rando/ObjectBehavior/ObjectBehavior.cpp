@@ -246,7 +246,6 @@ void Rando::ObjectBehavior::Init() {
     InitBundleBehavior();
     InitJiggyBehavior();
     InitJinjoBehavior();
-    InitMolehillBehavior();
     InitStopNSwopBehavior();
 
     UpdateJunkList();
