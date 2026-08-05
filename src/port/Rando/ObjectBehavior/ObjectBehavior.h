@@ -17,7 +17,6 @@ void InitBundleBehavior();
 void InitJiggyBehavior();
 void InitJinjoBehavior();
 void InitMolehillBehavior();
-void InitMusicNoteBehavior();
 void InitStopNSwopBehavior();
 
 void ModifySwitchBehavior(int32_t switchActorId);

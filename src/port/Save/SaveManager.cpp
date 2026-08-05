@@ -76,7 +76,7 @@ static void BitfieldSetNBits(uint8_t* array, int startIndex, int numBits, int va
 void RandoSaveCheck_to_json(nlohmann::json& j, const RandoSaveCheck& randoSaveCheck) {
     j = nlohmann::json::array({ randoSaveCheck.randoCheckId, randoSaveCheck.randoItemId,
                                 randoSaveCheck.randoCollectionId, randoSaveCheck.isShuffled, randoSaveCheck.eligible,
-                                randoSaveCheck.skipped });
+                                randoSaveCheck.received, randoSaveCheck.skipped });
 }
 
 RandoSaveCheck RandoSaveCheck_from_json(const nlohmann::json& j, RandoSaveCheck& randoSaveCheck) {
@@ -85,7 +85,8 @@ RandoSaveCheck RandoSaveCheck_from_json(const nlohmann::json& j, RandoSaveCheck&
     j.at(2).get_to(randoSaveCheck.randoCollectionId);
     j.at(3).get_to(randoSaveCheck.isShuffled);
     j.at(4).get_to(randoSaveCheck.eligible);
-    j.at(5).get_to(randoSaveCheck.skipped);
+    j.at(5).get_to(randoSaveCheck.received);
+    j.at(6).get_to(randoSaveCheck.skipped);
 
     return randoSaveCheck;
 }

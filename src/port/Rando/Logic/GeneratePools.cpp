@@ -178,6 +178,7 @@ void GeneratePoolFromSaveData(SaveData* saveData) {
             .randoCollectionId = randoSaveCheck.randoCollectionId,
             .isShuffled = randoSaveCheck.isShuffled,
             .eligible = randoSaveCheck.eligible,
+            .received = randoSaveCheck.received,
             .skipped = randoSaveCheck.skipped,
         };
 
