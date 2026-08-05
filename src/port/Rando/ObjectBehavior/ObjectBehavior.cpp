@@ -164,12 +164,14 @@ static void EmitCheckNotification(RandoCheckId randoCheckId, const std::string& 
     std::string prefix;
     std::string message;
     std::string suffix = "";
-    ImVec4 itemColor = WIDGET_TEXT_COLOR(randoItemColors.at(randoSaveCheck.randoItemId));
+    ImVec4 itemColor =
+        WIDGET_TEXT_COLOR(randoItemColors.at((actor_e)Rando::StaticData::Items[randoSaveCheck.randoItemId].actorId));
+    RandoItemType itemType = Rando::StaticData::Items[randoSaveCheck.randoItemId].randoItemType;
 
-    if (randoSaveCheck.randoItemId == RI_MOLEHILL) {
+    if (itemType == RITYPE_MOLEHILL) {
         prefix = subject + " learned";
         message = abilityNameList[randoSaveCheck.randoCollectionId].c_str();
-    } else if (randoSaveCheck.randoItemId == RI_STOP_N_SWOP_EGG || randoSaveCheck.randoItemId == RI_STOP_N_SWOP_KEY) {
+    } else if (itemType == RITYPE_SNS_EGG || itemType == RITYPE_SNS_KEY) {
         int32_t totalsnsItems = Rando::Logic::GetTotalSnsItemsCollected();
         prefix = subject + " collected ";
         prefix += Rando::StaticData::Items[randoSaveCheck.randoItemId].article;

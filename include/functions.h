@@ -3492,7 +3492,4 @@ void codeCF5F0_triggerAntiTamperMeasurement(void);
 }
 #endif
 
-// --- port/TooieJiggyDance.cpp
-void spawnOrbit();
-
 #endif // FUNCTIONS_H

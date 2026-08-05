@@ -11,7 +11,7 @@ extern "C" {
 #include "actor.h"
 void __chJinjo_802CDC9C(Actor* thisx, s16 arg1);
 Actor* func_802D94B4(ActorMarker* marker, Gfx** gfx, Mtx** mtx, Vtx** vtx);
-Actor* func_802D41C4(ActorMarker* marker, Gfx** gfx, Mtx** mtx, Vtx** vtx);
+Actor* chSnsEgg_draw(ActorMarker* marker, Gfx** gfx, Mtx** mtx, Vtx** vtx);
 }
 
 static std::queue<QueuedProp> propQueue;
@@ -212,7 +212,7 @@ ActorInfo CustomCollectible::GetActorAndDrawInfo(RandoItemId randoItemId) {
             collectibleInfo.startAnimation = 3;
             break;
         case CCT_VANILLA_SNS_EGG:
-            collectibleInfo.draw_func = func_802D41C4;
+            collectibleInfo.draw_func = chSnsEgg_draw;
             break;
         case CCT_CUSTOM_MODEL:
             collectibleInfo.draw_func = CustomCollectible_DrawCustomModel;

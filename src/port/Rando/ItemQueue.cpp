@@ -28,6 +28,7 @@ extern ActorInfo chJinjoGreen;
 extern ActorInfo chJinjoYellow;
 extern ActorInfo chJinjoPink;
 extern ActorInfo chJinjoOrange;
+extern void spawnOrbit();
 }
 
 #define CVAR_NAME_SHOW_COLLISION_NOTIFICATIONS "gRandoSettings.RandoNotifications"

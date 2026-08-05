@@ -191,7 +191,7 @@ void Rando::Logic::GrantSpiralMountainChecks() {
         }
 
         CustomObject::CheckObtainedEX(smCheckId, true);
-        if (randoSaveCheck.randoItemId == RI_MOLEHILL) {
+        if (Rando::StaticData::Items[randoSaveCheck.randoItemId].randoItemType == RITYPE_MOLEHILL) {
             ability_setLearned((ability_e)randoSaveCheck.randoCollectionId, true);
             ability_setHasUsed((ability_e)randoSaveCheck.randoCollectionId);
         }
