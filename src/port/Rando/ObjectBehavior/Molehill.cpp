@@ -7,6 +7,9 @@
 #include <libultraship/bridge/consolevariablebridge.h>
 #include "port/Enhancements/Events/PortEnhancements.h"
 #include "port/Enhancements/Events/Hooks/Events.h"
+#include "port/ShipInit.hpp"
+
+#include "port/Rando/CustomCollectible/CustomCollectible.h"
 
 #define MOLETABLE_SIZE 16
 #define BRIDGE_REQUIREMENT 6
@@ -201,3 +204,36 @@ void Rando::ObjectBehavior::InitMolehillBehavior() {
         }
     })
 }
+
+bool OverrideMoleSpawn(OnActorSpawn* ev) {
+    if (ev->actorId != ACTOR_12B_TUTORIAL_BOTTLES) {
+        return false;
+    }
+
+    int32_t spawnPosition[3] = { ev->posX, ev->posY, ev->posZ };
+    RandoCheckId randoCheckId = Rando::StaticData::GetCheckByPosition(ev->posX, ev->posY, ev->posZ);
+
+    if (randoCheckId == RC_UNKNOWN || !Rando::Logic::IsCheckShuffled(randoCheckId)) {
+        return false;
+    }
+
+    if (Rando::Logic::IsCheckObtained(randoCheckId)) {
+        return true;
+    }
+
+    CustomCollectible::Spawn(spawnPosition, randoCheckId);
+    return true;
+}
+
+void RegisterRandoMolehills() {
+    COND_HOOK(OnActorSpawn, EVENT_PRIORITY_NORMAL, IS_RANDO && OPTION_ENABLED, [](IEvent* event) {
+        OnActorSpawn* ev = (OnActorSpawn*)event;
+        
+        bool replaceMole = OverrideMoleSpawn(ev);
+        if (replaceMole) {
+            event->Cancelled = true;
+        }
+    });
+}
+
+static RegisterShipInitFunc initFunc(RegisterRandoMolehills, { "IS_RANDO" });

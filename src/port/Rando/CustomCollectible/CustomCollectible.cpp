@@ -108,6 +108,7 @@ f32 CustomCollectible::GetScale(RandoItemType itemType) {
         case RITYPE_SNS_EGG:
             return 0.42857143f;
         case RITYPE_EMPTY_HONEYCOMB:
+        case RITYPE_MOLEHILL:
             return 0.8f;
         default:
             return 1.0f;
