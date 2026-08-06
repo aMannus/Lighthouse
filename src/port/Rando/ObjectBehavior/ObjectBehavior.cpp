@@ -20,18 +20,9 @@ std::map<RandoCheckId, std::tuple<int32_t, int32_t, int32_t>> randoSaveState;
 
 // clang-format off
 std::vector<int32_t> actorSpawnWhitelist = {
-    ACTOR_2D_MUMBO_TOKEN,
-    ACTOR_46_JIGGY,
     ACTOR_47_EMPTY_HONEYCOMB,
     ACTOR_49_EXTRA_LIFE,
     ACTOR_50_HONEYCOMB,
-    ACTOR_51_MUSIC_NOTE,
-    ACTOR_52_BLUE_EGG,
-    ACTOR_5E_JINJO_YELLOW,
-    ACTOR_5F_JINJO_ORANGE,
-    ACTOR_60_JINJO_BLUE,
-    ACTOR_61_JINJO_PINK,
-    ACTOR_62_JINJO_GREEN,
     ACTOR_25E_SNS_EGG,
     ACTOR_25D_ICE_KEY,
     //ACTOR_12C_MOLEHILL,
@@ -251,7 +242,6 @@ static void FireClearBundleDespawnQueue() {
 // Entry point for the module, run once on game boot
 void Rando::ObjectBehavior::Init() {
     InitBundleBehavior();
-    InitJinjoBehavior();
     InitStopNSwopBehavior();
 
     UpdateJunkList();

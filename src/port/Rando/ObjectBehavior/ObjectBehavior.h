@@ -14,7 +14,6 @@ namespace ObjectBehavior {
 
 void Init();
 void InitBundleBehavior();
-void InitJinjoBehavior();
 void InitStopNSwopBehavior();
 
 void ModifySwitchBehavior(int32_t switchActorId);

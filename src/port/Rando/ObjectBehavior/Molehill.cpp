@@ -38,7 +38,7 @@ bool CheckBridgeState() {
 }
 
 bool OverrideMoleSpawn(OnActorSpawn* ev) {
-    if (ev->actorId != ACTOR_12B_TUTORIAL_BOTTLES) {
+    if (ev->actorId != ACTOR_12B_TUTORIAL_BOTTLES && ev->actorId != ACTOR_37A_BOTTLES) {
         return false;
     }
 

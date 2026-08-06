@@ -36,30 +36,17 @@ std::unordered_map<actor_e, CustomCollectibleDrawInfo> customCollectibleDrawInfo
 };
 
 ActorAnimationInfo moleAnimations[] = {
-    { 0, 0.0f },
-    { ASSET_13A_ANIM_BOTTLES_ENTER, 2000000000.0f },
-    { ASSET_13A_ANIM_BOTTLES_ENTER, 4.5f },
     { ASSET_13B_ANIM_BOTTLES_IDLE, 7.0f },
-    { ASSET_139_ANIM_BOTTLES_EXIT, 1.7f },
-    { ASSET_13A_ANIM_BOTTLES_ENTER, 2000000000.0f },
 };
 
-ActorAnimationInfo chJinjoAnimations[] = { { 0, 0.0f },
-                                           { ASSET_2D_ANIM_JINJO_IDLE, 1000000.0f },
-                                           { ASSET_2D_ANIM_JINJO_IDLE, 1.5f },
-                                           { ASSET_2F_ANIM_JINJO_HELP, 1.5f },
-                                           { ASSET_31_ANIM_JINJO_JUMP, 0.75f },
-                                           { ASSET_2D_ANIM_JINJO_IDLE, 1000000.0f },
-                                           { ASSET_31_ANIM_JINJO_JUMP, 0.4f },
-                                           { ASSET_130_ANIM_JINJO_FLY_START, 1.75f },
-                                           { ASSET_131_ANIM_JINJO_FLY_END, 2.13333f },
-                                           { ASSET_31_ANIM_JINJO_JUMP, 0.75f },
+ActorAnimationInfo chJinjoAnimations[] = {
+    { ASSET_2F_ANIM_JINJO_HELP, 1.5f },
 };
 
 ActorInfo customActorInfo = { MARKER_300_CUSTOM_COLLECTIBLE,
                               ACTOR_3CD_CUSTOM_COLLECTIBLE,
                               ASSET_0_NONE,
-                              1,
+                              0,
                               NULL,
                               CustomCollectible_Update,
                               NULL,
@@ -204,12 +191,10 @@ ActorInfo CustomCollectible::GetActorAndDrawInfo(RandoItemId randoItemId) {
         case CCT_JINJO:
             collectibleInfo.draw_func = actor_draw;
             collectibleInfo.animations = chJinjoAnimations;
-            collectibleInfo.startAnimation = 3;
             break;
         case CCT_MOLEHILL:
             collectibleInfo.draw_func = func_802D94B4;
             collectibleInfo.animations = moleAnimations;
-            collectibleInfo.startAnimation = 3;
             break;
         case CCT_VANILLA_SNS_EGG:
             collectibleInfo.draw_func = chSnsEgg_draw;
