@@ -35,11 +35,11 @@ std::unordered_map<actor_e, CustomCollectibleDrawInfo> customCollectibleDrawInfo
     { ACTOR_3CD_CUSTOM_COLLECTIBLE, { ASSET_35F_MODEL_JIGGY, CCT_CUSTOM_MODEL } },
 };
 
-ActorAnimationInfo moleAnimations[] = {
+ActorAnimationInfo moleAnimation[] = {
     { ASSET_13B_ANIM_BOTTLES_IDLE, 7.0f },
 };
 
-ActorAnimationInfo chJinjoAnimations[] = {
+ActorAnimationInfo chJinjoAnimation[] = {
     { ASSET_2F_ANIM_JINJO_HELP, 1.5f },
 };
 
@@ -190,11 +190,11 @@ ActorInfo CustomCollectible::GetActorAndDrawInfo(RandoItemId randoItemId) {
             break;
         case CCT_JINJO:
             collectibleInfo.draw_func = actor_draw;
-            collectibleInfo.animations = chJinjoAnimations;
+            collectibleInfo.animations = chJinjoAnimation;
             break;
         case CCT_MOLEHILL:
             collectibleInfo.draw_func = func_802D94B4;
-            collectibleInfo.animations = moleAnimations;
+            collectibleInfo.animations = moleAnimation;
             break;
         case CCT_VANILLA_SNS_EGG:
             collectibleInfo.draw_func = chSnsEgg_draw;
