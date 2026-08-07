@@ -90,7 +90,7 @@ void CustomCollectible_Update(Actor* actor) {
 }
 
 f32 CustomCollectible::GetScale(RandoItemType itemType) {
-    switch (itemType) { 
+    switch (itemType) {
         case RITYPE_MUSIC_NOTE:
         case RITYPE_SNS_EGG:
             return 0.42857143f;
@@ -228,7 +228,7 @@ void CustomCollectible::QueueProp(int32_t position[3], RandoCheckId randoCheckId
 }
 
 void CustomCollectible::ProcessPropQueue() {
-   while (propQueue.size() > 0) {
+    while (propQueue.size() > 0) {
         QueuedProp prop = propQueue.front();
         Actor* actor = CustomCollectible::Spawn(prop.position, prop.randoCheckId);
         propQueue.pop();

@@ -10,11 +10,11 @@ typedef struct {
 } ActorLocal_CustomCollectible;
 
 enum CustomCollectibleDrawTypes {
-    CCT_GENERIC_MODEL, 
+    CCT_GENERIC_MODEL,
     CCT_GENERIC_SPRITE,
     CCT_JINJO,
-    CCT_MOLEHILL, 
-    CCT_VANILLA_SNS_EGG, 
+    CCT_MOLEHILL,
+    CCT_VANILLA_SNS_EGG,
     CCT_CUSTOM_MODEL,
 };
 

@@ -72,7 +72,7 @@ void ItemQueue::Process() {
     if (itemQueue.size() < 1) {
         return;
     }
-    
+
     RandoCheckId randoCheckId = itemQueue.front();
 
     // Grant item
@@ -81,7 +81,7 @@ void ItemQueue::Process() {
         ItemQueue::GiveItem(randoSaveCheck.randoItemId);
         ItemQueue::SendNotification(randoSaveCheck.randoItemId);
         Rando::StaticData::ModifyRandoInfFlagState(randoCheckId);
-        //RANDO_SAVE_CHECKS[randoCheckId].received = true;
+        // RANDO_SAVE_CHECKS[randoCheckId].received = true;
     }
 
     itemQueue.pop();
@@ -154,8 +154,9 @@ void ItemQueue::GiveItem(RandoItemId randoItemId) {
             }
             setCollectedBits(worldId, collectedJinjos);
             // Spawn vanilla jinjo on top of the player because the animation is too complex to handle without doing
-            // this. Collection behaviour is canceled in Jinjo.cpp so that part can all be handled here in the ItemQueue.
-            switch (actorId) { 
+            // this. Collection behaviour is canceled in Jinjo.cpp so that part can all be handled here in the
+            // ItemQueue.
+            switch (actorId) {
                 case ACTOR_5E_JINJO_YELLOW:
                     actorInfo = &chJinjoYellow;
                     break;
@@ -237,7 +238,7 @@ void ItemQueue::GiveItem(RandoItemId randoItemId) {
         case RITYPE_MUMBO_TOKEN:
             func_8030E760((sfx_e)0x401, 1.0f, 0x7fff);
             for (uint32_t i = MUMBOTOKEN_01_MM_STUMP_NEAR_CONGA;
-                i <= MUMBOTOKEN_73_CCW_WINTER_SIR_SLUSH_BETWEEN_BIG_FLOWER_AND_MUMBOS_SKULL; i++) {
+                 i <= MUMBOTOKEN_73_CCW_WINTER_SIR_SLUSH_BETWEEN_BIG_FLOWER_AND_MUMBOS_SKULL; i++) {
                 if ((sMumboTokenScore[(i - 1) / 8] & (1 << (i & 7))) == 0) {
                     mumboscore_set((mumbotoken_e)i, true);
                     break;
@@ -335,13 +336,9 @@ void ItemQueue::AddCheck(RandoCheckId randoCheckId) {
 }
 
 void RegisterItemQueue() {
-    COND_HOOK(GameFrameUpdate, EVENT_PRIORITY_NORMAL, IS_RANDO, [](IEvent* event) { 
-        ItemQueue::Process();
-    });
+    COND_HOOK(GameFrameUpdate, EVENT_PRIORITY_NORMAL, IS_RANDO, [](IEvent* event) { ItemQueue::Process(); });
 
-    COND_HOOK(OnSaveFileLoad, EVENT_PRIORITY_NORMAL, IS_RANDO, [](IEvent* event) { 
-        ItemQueue::Clear();
-    });
+    COND_HOOK(OnSaveFileLoad, EVENT_PRIORITY_NORMAL, IS_RANDO, [](IEvent* event) { ItemQueue::Clear(); });
 }
 
 static RegisterShipInitFunc initFunc(RegisterItemQueue, { "IS_RANDO" });

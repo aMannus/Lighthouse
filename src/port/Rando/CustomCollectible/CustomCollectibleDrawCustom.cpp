@@ -69,8 +69,8 @@ Actor* CustomCollectible_DrawCustomModel(ActorMarker* marker, Gfx** gfx, Mtx** m
     Actor* actor = marker_getActor(marker);
     ActorLocal_CustomCollectible* customLocal = (ActorLocal_CustomCollectible*)&actor->local;
     CustomItemModel model;
-    
-    switch (customLocal->randoItemId) { 
+
+    switch (customLocal->randoItemId) {
         case RI_AP_ITEM_PROGRESSION:
             model = ARCHIPELAGO_MODEL_PROGRESSIVE;
             break;

@@ -27,7 +27,7 @@ bool OverrideJinjoSpawn(OnActorSpawn* ev) {
     if (!Rando::Logic::IsCheckObtained(randoCheckId)) {
         CustomCollectible::Spawn(spawnPosition, randoCheckId);
     }
-    
+
     return true;
 }
 

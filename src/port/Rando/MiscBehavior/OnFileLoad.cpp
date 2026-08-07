@@ -16,7 +16,6 @@ extern "C" {
 enum map_e gsworld_getMap(void);
 }
 
-
 void Rando::MiscBehavior::OnFileLoad() {
     REGISTER_LISTENER(OnGameLoad, EVENT_PRIORITY_NORMAL, [](IEvent* event) {
         OnGameLoad* ev = (OnGameLoad*)event;

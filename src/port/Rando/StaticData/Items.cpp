@@ -11,10 +11,10 @@ namespace Rando {
 namespace StaticData {
 
 #define RI(id, article, name, type, actorId, worldId)      \
-    {                                             \
-        id, {                                     \
+    {                                                      \
+        id, {                                              \
             id, #id, article, name, type, actorId, worldId \
-        }                                         \
+        }                                                  \
     }
 
 // clang-format off

@@ -18,8 +18,7 @@ typedef struct {
 
 int32_t vileCount = 0;
 
-RandoBundleInfo
-    IdentifyBundle(bundle_e bundleId, BundleInfo* bundleInfo, s32 bundleCount, f32 spawnPosition[3]) {
+RandoBundleInfo IdentifyBundle(bundle_e bundleId, BundleInfo* bundleInfo, s32 bundleCount, f32 spawnPosition[3]) {
     map_e currentMap = gsworld_getMap();
     level_e currentLevel = map_getLevel(currentMap);
     s32 position[3] = { (int32_t)spawnPosition[0], (int32_t)spawnPosition[1], (int32_t)spawnPosition[2] };
@@ -97,7 +96,8 @@ RandoBundleInfo
                         randoBundleInfo.randoCheckId =
                             (RandoCheckId)((int32_t)RC_TTC_HONEYCOMB_BEEHIVE_IN_THE_CLIFFSIDE_POOL_1 + bundleCount);
                     } else if (position[1] < 875 && position[1] > 870) {
-                        randoBundleInfo.randoCheckId = (RandoCheckId)((int32_t)RC_TTC_HONEYCOMB_BEEHIVE_ON_THE_BEACH_1 + bundleCount);
+                        randoBundleInfo.randoCheckId =
+                            (RandoCheckId)((int32_t)RC_TTC_HONEYCOMB_BEEHIVE_ON_THE_BEACH_1 + bundleCount);
                     }
                     break;
             }
@@ -116,7 +116,8 @@ RandoBundleInfo
                     break;
                 case BUNDLE_18__HONEYCOMB:
                     if (position[1] < 1405 && position[1] > 1395) {
-                        randoBundleInfo.randoCheckId = (RandoCheckId)((int32_t)RC_CC_HONEYCOMB_BEEHIVE_INSIDE_CLANKER_1 + bundleCount);
+                        randoBundleInfo.randoCheckId =
+                            (RandoCheckId)((int32_t)RC_CC_HONEYCOMB_BEEHIVE_INSIDE_CLANKER_1 + bundleCount);
                     } else if (position[1] < 5495 && position[1] > 5490) {
                         randoBundleInfo.randoCheckId =
                             (RandoCheckId)((int32_t)RC_CC_HONEYCOMB_BEEHIVE_NEAR_THE_ENTRANCE_1 + bundleCount);
@@ -183,9 +184,11 @@ RandoBundleInfo
                         randoBundleInfo.randoCheckId =
                             (RandoCheckId)((int32_t)RC_BGS_HONEYCOMB_BEEHIVE_NEAR_MAZE_ENTRANCE_1 + bundleCount);
                     } else if (position[0] < 4390 && position[0] > 4385) {
-                        randoBundleInfo.randoCheckId = (RandoCheckId)((int32_t)RC_BGS_HONEYCOMB_BEEHIVE_NEAR_TANKTUP_1 + bundleCount);
+                        randoBundleInfo.randoCheckId =
+                            (RandoCheckId)((int32_t)RC_BGS_HONEYCOMB_BEEHIVE_NEAR_TANKTUP_1 + bundleCount);
                     } else if (position[0] < 2565 && position[0] > 2560) {
-                        randoBundleInfo.randoCheckId = (RandoCheckId)((int32_t)RC_BGS_HONEYCOMB_BEEHIVE_NEAR_WARP_PAD_1 + bundleCount);
+                        randoBundleInfo.randoCheckId =
+                            (RandoCheckId)((int32_t)RC_BGS_HONEYCOMB_BEEHIVE_NEAR_WARP_PAD_1 + bundleCount);
                     }
                     break;
                 default:
@@ -209,13 +212,17 @@ RandoBundleInfo
                     break;
                 case BUNDLE_18__HONEYCOMB:
                     if (position[1] < 820 && position[1] > 810) {
-                        randoBundleInfo.randoCheckId = (RandoCheckId)((int32_t)RC_FP_HONEYCOMB_BEEHIVE_NEAR_RACE_START_1 + bundleCount);
+                        randoBundleInfo.randoCheckId =
+                            (RandoCheckId)((int32_t)RC_FP_HONEYCOMB_BEEHIVE_NEAR_RACE_START_1 + bundleCount);
                     } else if (position[1] < 590 && position[1] > 580) {
-                        randoBundleInfo.randoCheckId = (RandoCheckId)((int32_t)RC_FP_HONEYCOMB_BEEHIVE_PRESENT_STACK_1 + bundleCount);
+                        randoBundleInfo.randoCheckId =
+                            (RandoCheckId)((int32_t)RC_FP_HONEYCOMB_BEEHIVE_PRESENT_STACK_1 + bundleCount);
                     } else if (position[1] < 1755 && position[1] > 1745) {
-                        randoBundleInfo.randoCheckId = (RandoCheckId)((int32_t)RC_FP_HONEYCOMB_BEEHIVE_SCARF_END_1 + bundleCount);
+                        randoBundleInfo.randoCheckId =
+                            (RandoCheckId)((int32_t)RC_FP_HONEYCOMB_BEEHIVE_SCARF_END_1 + bundleCount);
                     } else if (position[1] < 5760 && position[1] > 5750) {
-                        randoBundleInfo.randoCheckId = (RandoCheckId)((int32_t)RC_FP_HONEYCOMB_BEEHIVE_SCARF_START_1 + bundleCount);
+                        randoBundleInfo.randoCheckId =
+                            (RandoCheckId)((int32_t)RC_FP_HONEYCOMB_BEEHIVE_SCARF_START_1 + bundleCount);
                     }
                     break;
                 default:
@@ -282,8 +289,9 @@ RandoBundleInfo
                                 (RandoCheckId)((int32_t)RC_GL_HONEYCOMB_BEEHIVE_NEAR_CC_ENTRANCE_1 + bundleCount);
                             break;
                         case MAP_71_GL_STATUE_ROOM:
-                            randoBundleInfo.randoCheckId = (RandoCheckId)((int32_t)RC_GL_HONEYCOMB_BEEHIVE_NEAR_FIRST_GRUNTY_STATUE_1 +
-                                                          bundleCount);
+                            randoBundleInfo.randoCheckId =
+                                (RandoCheckId)((int32_t)RC_GL_HONEYCOMB_BEEHIVE_NEAR_FIRST_GRUNTY_STATUE_1 +
+                                               bundleCount);
                             break;
                         case MAP_72_GL_BGS_LOBBY:
                             randoBundleInfo.randoCheckId =
@@ -324,7 +332,8 @@ RandoBundleInfo
                         randoBundleInfo.randoCheckId =
                             (RandoCheckId)((int32_t)RC_GV_HONEYCOMB_BEEHIVE_NEAR_PUZZLE_PYRAMID_1 + bundleCount);
                     } else if (position[1] < 610 && position[1] > 600) {
-                        randoBundleInfo.randoCheckId = (RandoCheckId)((int32_t)RC_GV_HONEYCOMB_BEEHIVE_NEAR_WARP_PAD_1 + bundleCount);
+                        randoBundleInfo.randoCheckId =
+                            (RandoCheckId)((int32_t)RC_GV_HONEYCOMB_BEEHIVE_NEAR_WARP_PAD_1 + bundleCount);
                     }
                     break;
                 default:
@@ -363,8 +372,9 @@ RandoBundleInfo
                             break;
                         case MAP_44_CCW_SUMMER:
                             if (position[1] < -440 && position[1] > -450) {
-                                randoBundleInfo.randoCheckId = (RandoCheckId)((int32_t)RC_CCW_HONEYCOMB_BEEHIVE_SUMMER_DRIED_UP_LAKE_1 +
-                                                              bundleCount);
+                                randoBundleInfo.randoCheckId =
+                                    (RandoCheckId)((int32_t)RC_CCW_HONEYCOMB_BEEHIVE_SUMMER_DRIED_UP_LAKE_1 +
+                                                   bundleCount);
                             } else if (position[1] < 160 && position[1] > 150) {
                                 randoBundleInfo.randoCheckId =
                                     (RandoCheckId)((int32_t)RC_CCW_HONEYCOMB_BEEHIVE_SUMMER_GRASS_NEAR_THE_ENTRANCE_1 +
@@ -438,8 +448,9 @@ RandoBundleInfo
                     switch (currentMap) {
                         case MAP_1C_MMM_CHURCH:
                             if (position[0] < 1880 && position[0] > 1870) {
-                                randoBundleInfo.randoCheckId = (RandoCheckId)((int32_t)RC_MMM_HONEYCOMB_BEEHIVE_CHURCH_ORGAN_RIGHT_1 +
-                                                              bundleCount);
+                                randoBundleInfo.randoCheckId =
+                                    (RandoCheckId)((int32_t)RC_MMM_HONEYCOMB_BEEHIVE_CHURCH_ORGAN_RIGHT_1 +
+                                                   bundleCount);
                             } else if (position[0] < -1870 && position[0] > -1880) {
                                 randoBundleInfo.randoCheckId =
                                     (RandoCheckId)((int32_t)RC_MMM_HONEYCOMB_BEEHIVE_CHURCH_ORGAN_LEFT_1 + bundleCount);

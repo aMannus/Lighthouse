@@ -74,7 +74,7 @@ void RegisterRandoMolehills() {
 
     COND_HOOK(OnActorSpawn, EVENT_PRIORITY_NORMAL, IS_RANDO && OPTION_ENABLED, [](IEvent* event) {
         OnActorSpawn* ev = (OnActorSpawn*)event;
-        
+
         bool replaceMole = OverrideMoleSpawn(ev);
         if (replaceMole) {
             event->Cancelled = true;
