@@ -139,6 +139,7 @@ void ItemQueue::GiveItem(RandoItemId randoItemId) {
                 }
             }
             coMusicPlayer_playMusic(COMUSIC_D_JINGLE_JIGGY_COLLECTED, -1);
+            item_adjustByDiffWithoutHud(ITEM_26_JIGGY_TOTAL, 1);
             item_inc(ITEM_E_JIGGY);
             spawnOrbit();
             break;
