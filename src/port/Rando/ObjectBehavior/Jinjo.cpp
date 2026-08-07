@@ -24,11 +24,10 @@ bool OverrideJinjoSpawn(OnActorSpawn* ev) {
         return false;
     }
 
-    if (Rando::Logic::IsCheckObtained(randoCheckId)) {
-        return true;
+    if (!Rando::Logic::IsCheckObtained(randoCheckId)) {
+        CustomCollectible::Spawn(spawnPosition, randoCheckId);
     }
-
-    CustomCollectible::Spawn(spawnPosition, randoCheckId);
+    
     return true;
 }
 

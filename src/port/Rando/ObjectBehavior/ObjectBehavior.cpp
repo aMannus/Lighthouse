@@ -241,7 +241,6 @@ static void FireClearBundleDespawnQueue() {
 
 // Entry point for the module, run once on game boot
 void Rando::ObjectBehavior::Init() {
-    InitBundleBehavior();
     InitStopNSwopBehavior();
 
     UpdateJunkList();
@@ -251,7 +250,6 @@ void Rando::ObjectBehavior::Init() {
         map_e currentMap = gsworld_getMap();
 
         CustomObject::FlushRandoSpawnQueue();
-        DespawnCollectedBundles();
 
         if (ev->actorId == ACTOR_12_BEEHIVE) {
             SPDLOG_INFO("Actor ID: {} {}, {}, {}", ev->actorId, ev->posX, ev->posY, ev->posZ);
