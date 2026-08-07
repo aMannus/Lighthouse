@@ -79,7 +79,7 @@ std::vector<RandoCheckId> enemyKillOverlapList = {
 bool nextActorSaveState = false;
 
 bool IsActorWhitelisted(int32_t actorId) {
-    for (auto& entry : actorSpawnWhitelist) {
+    /*for (auto& entry : actorSpawnWhitelist) {
         if (entry == actorId) {
             return true;
         }
@@ -91,7 +91,7 @@ bool IsActorWhitelisted(int32_t actorId) {
                 return true;
             }
         }
-    }
+    }*/
 
     return false;
 }
