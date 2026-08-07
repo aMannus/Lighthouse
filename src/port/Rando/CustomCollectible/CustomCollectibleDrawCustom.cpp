@@ -15,8 +15,8 @@
 //    extern "C" block below.
 #include <libultraship/bridge.h>
 #include "port/ResourceHelpers.h"
-#include "port/enhancements/events/hooks/Events.h"
-#include "port/interpolation/FrameInterpolation.h"
+#include "port/Enhancements/Events/Hooks/Events.h"
+#include "port/Interpolation/FrameInterpolation.h"
 
 #include "CustomCollectibleDrawCustom.h"
 #include "CustomCollectible.h"
