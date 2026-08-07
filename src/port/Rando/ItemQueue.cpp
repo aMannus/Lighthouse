@@ -10,6 +10,7 @@
 #include "port/ShipInit.hpp"
 #include "port/Rando/Logic/Logic.h"
 #include "actor.h"
+#include "port/Enhancements/Retention/Retention.h"
 
 extern "C" {
 #include "functions.h"
@@ -31,6 +32,8 @@ extern ActorInfo chJinjoOrange;
 extern void spawnOrbit();
 }
 
+constexpr u8 kAllJinjos = 0x1F; // all five color bits collected
+
 #define CVAR_NAME_SHOW_COLLISION_NOTIFICATIONS "gRandoSettings.RandoNotifications"
 #define CVAR_SHOW_COLLISION_NOTIFICATIONS CVarGetInteger(CVAR_NAME_SHOW_COLLISION_NOTIFICATIONS, 0)
 
@@ -39,7 +42,7 @@ extern void spawnOrbit();
 
 static std::queue<RandoCheckId> itemQueue;
 
-std::map<actor_e, UIWidgets::Colors> itemColors = {
+std::unordered_map<actor_e, UIWidgets::Colors> itemColors = {
     { ACTOR_1_UNKNOWN, UIWidgets::Colors::Brown },           { ACTOR_52_BLUE_EGG, UIWidgets::Colors::Cyan },
     { ACTOR_47_EMPTY_HONEYCOMB, UIWidgets::Colors::Yellow }, { ACTOR_49_EXTRA_LIFE, UIWidgets::Colors::Yellow },
     { ACTOR_50_HONEYCOMB, UIWidgets::Colors::Yellow },       { ACTOR_46_JIGGY, UIWidgets::Colors::Yellow },
@@ -50,11 +53,19 @@ std::map<actor_e, UIWidgets::Colors> itemColors = {
     { ACTOR_25E_SNS_EGG, UIWidgets::Colors::Pink },          { ACTOR_25D_ICE_KEY, UIWidgets::Colors::White },
 };
 
-std::map<RandoItemId, UIWidgets::Colors> snsColors = {
+std::unordered_map<RandoItemId, UIWidgets::Colors> snsColors = {
     { RI_STOP_N_SWOP_EGG_YELLOW, UIWidgets::Colors::Yellow }, { RI_STOP_N_SWOP_EGG_RED, UIWidgets::Colors::Red },
     { RI_STOP_N_SWOP_EGG_GREEN, UIWidgets::Colors::Green },   { RI_STOP_N_SWOP_EGG_BLUE, UIWidgets::Colors::Blue },
     { RI_STOP_N_SWOP_EGG_PINK, UIWidgets::Colors::Pink },     { RI_STOP_N_SWOP_EGG_CYAN, UIWidgets::Colors::Cyan },
     { RI_STOP_N_SWOP_ICE_KEY, UIWidgets::Colors::White },
+};
+
+std::unordered_map<int16_t, RandoCheckId> jinjoJiggyChecks = {
+    { LEVEL_1_MUMBOS_MOUNTAIN, RC_MM_JIGGY_JINJO },      { LEVEL_2_TREASURE_TROVE_COVE, RC_TTC_JIGGY_JINJO },
+    { LEVEL_3_CLANKERS_CAVERN, RC_CC_JIGGY_JINJO },      { LEVEL_4_BUBBLEGLOOP_SWAMP, RC_BGS_JIGGY_JINJO },
+    { LEVEL_5_FREEZEEZY_PEAK, RC_FP_JIGGY_JINJO },       { LEVEL_7_GOBIS_VALLEY, RC_GV_JIGGY_JINJO },
+    { LEVEL_8_CLICK_CLOCK_WOOD, RC_CCW_JIGGY_JINJO },    { LEVEL_9_RUSTY_BUCKET_BAY, RC_RBB_JIGGY_JINJO },
+    { LEVEL_A_MAD_MONSTER_MANSION, RC_MMM_JIGGY_JINJO },
 };
 
 void ItemQueue::Process() {
@@ -70,7 +81,7 @@ void ItemQueue::Process() {
         ItemQueue::GiveItem(randoSaveCheck.randoItemId);
         ItemQueue::SendNotification(randoSaveCheck.randoItemId);
         Rando::StaticData::ModifyRandoInfFlagState(randoCheckId);
-        randoSaveCheck.received = true;
+        //RANDO_SAVE_CHECKS[randoCheckId].received = true;
     }
 
     itemQueue.pop();
@@ -86,6 +97,7 @@ void ItemQueue::GiveItem(RandoItemId randoItemId) {
     ActorInfo* actorInfo;
     int32_t playerPosition[3];
     Actor* customActor;
+    uint8_t collectedJinjos;
 
     switch (itemType) {
         case RITYPE_BLUE_EGG:
@@ -131,6 +143,17 @@ void ItemQueue::GiveItem(RandoItemId randoItemId) {
             spawnOrbit();
             break;
         case RITYPE_JINJO:
+            if (worldId == map_getLevel(gsworld_getMap())) {
+                item_adjustByDiffWithHud(ITEM_12_JINJOS, jinjoBitFromActor(actorId));
+            }
+            collectedJinjos = collectedBits(worldId);
+            collectedJinjos |= jinjoBitFromActor(actorId);
+            if (collectedJinjos == kAllJinjos) {
+                ItemQueue::AddCheck(jinjoJiggyChecks[worldId]);
+            }
+            setCollectedBits(worldId, collectedJinjos);
+            // Spawn vanilla jinjo on top of the player because the animation is too complex to handle without doing
+            // this. Collection behaviour is canceled in Jinjo.cpp so that part can all be handled here in the ItemQueue.
             switch (actorId) { 
                 case ACTOR_5E_JINJO_YELLOW:
                     actorInfo = &chJinjoYellow;
@@ -270,7 +293,7 @@ void ItemQueue::SendNotification(RandoItemId randoItemId) {
         std::string prefix = "";
         std::string message = Rando::StaticData::Items[randoItemId].name;
         std::string suffix = "";
-        ImVec4 itemColor = UIWidgets::ColorValues.at(itemColors.at(actorId));
+        ImVec4 itemColor = UIWidgets::ColorValues.at(itemColors[actorId]);
 
         if (itemType == RITYPE_MOLEHILL) {
             prefix = "You learned";
@@ -282,7 +305,7 @@ void ItemQueue::SendNotification(RandoItemId randoItemId) {
             suffix += std::to_string(totalsnsItems);
             suffix += " / 7)";
 
-            itemColor = UIWidgets::ColorValues.at(snsColors.at(randoItemId));
+            itemColor = UIWidgets::ColorValues.at(snsColors[randoItemId]);
         } else {
             prefix = "You collected ";
             prefix += Rando::StaticData::Items[randoItemId].article;
