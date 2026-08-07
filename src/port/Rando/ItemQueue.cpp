@@ -21,7 +21,7 @@ extern struct {
 } jiggyscore;
 #define MUMBO_TOKEN_COUNT 126
 #define MUMBOSCORE_SIZE (((MUMBO_TOKEN_COUNT - 1 + 7) & ~7) / 8)
-u8 sMumboTokenScore[MUMBOSCORE_SIZE];
+extern u8 sMumboTokenScore[MUMBOSCORE_SIZE];
 extern u8 D_80385FF0[0xE];
 
 extern ActorInfo chJinjoBlue;
