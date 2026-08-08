@@ -9,8 +9,13 @@
 #include "port/UI/cvar_prefixes.h"
 
 #include "port/Rando/Logic/Logic.h"
+#include "port/Rando/CheckTracker/CheckTracker.h"
 #include "port/Rando/Spoiler/Spoiler.h"
 #include "port/Rando/CheckTracker/CheckTracker.h"
+
+extern "C" {
+enum map_e gsworld_getMap(void);
+}
 
 extern "C" {
 enum map_e gsworld_getMap(void);

@@ -255,6 +255,10 @@ void Rando::ObjectBehavior::Init() {
             SPDLOG_INFO("Actor ID: {} {}, {}, {}", ev->actorId, ev->posX, ev->posY, ev->posZ);
         }
 
+        if (ev->actorId == ACTOR_12_BEEHIVE) {
+            SPDLOG_INFO("Actor ID: {} {}, {}, {}", ev->actorId, ev->posX, ev->posY, ev->posZ);
+        }
+
         if (currentMap == MAP_12_GV_GOBIS_VALLEY) {
             if (ev->actorId == ACTOR_118_GRABBA) {
                 event->Cancelled = RANDO_SAVE_CHECKS[RC_GV_JIGGY_GRABBA].eligible;
